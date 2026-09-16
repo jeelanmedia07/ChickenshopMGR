@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChickenMGR - Activation</title>
+
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#128161">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #fdfbf7, #eafaf1); 
+            margin: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+        }
+        .login-card { 
+            background: white; 
+            padding: 30px 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 380px; 
+            text-align: center; 
+            border-top: 8px solid #128161; 
+            box-sizing: border-box;
+        }
+        .logo-icon {
+            font-size: 45px;
+            margin-bottom: 10px;
+            display: inline-block;
+            background: #eafaf1;
+            padding: 12px;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .login-card h2 { 
+            margin: 0 0 5px 0; 
+            color: #2c3e50; 
+            font-size: 22px; 
+            font-weight: 800;
+        }
+        .login-card p { 
+            font-size: 12px; 
+            color: #95a5a6; 
+            margin-bottom: 20px; 
+        }
+        .input-box { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            margin-bottom: 15px; 
+            box-sizing: border-box; 
+            outline: none; 
+            text-align: center; 
+            font-weight: bold; 
+            letter-spacing: 2px; 
+            color: #333;
+            transition: 0.3s;
+        }
+        .input-box:focus {
+            border-color: #128161;
+            background: #f9fffb;
+        }
+        .activate-btn { 
+            background: #128161;
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            width: 100%; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 5px 15px rgba(18, 129, 97, 0.3);
+            transition: 0.3s; 
+        }
+        .activate-btn:hover { 
+            background: #0e664d;
+            transform: translateY(-2px);
+        }
+        .error-msg { color: #d9534f; font-size: 12px; margin-top: 10px; display: none; font-weight: 600; }
+        .loading { display: none; color: #128161; font-size: 12px; margin-top: 10px; font-weight: bold; }
+
+        /* WhatsApp Contact Box Style */
+        .whatsapp-contact {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        .whatsapp-contact p {
+            font-size: 11.5px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #25d366;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+            transition: 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .whatsapp-btn:hover {
+            background: #20ba5a;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-icon">🐔</div>
+        <h2>ChickenMGR</h2>
+        <p>Enter your activation key to unlock your shop manager</p>
+        
+        <input type="text" id="activationKey" class="input-box" placeholder="XXXX-XXXX-XXXX" autocomplete="off">
+        <button class="activate-btn" onclick="verifyKey()">Activate Now</button>
+        
+        <div class="loading" id="loadingMsg">Validating license with sheet...</div>
+        <div class="error-msg" id="errorMsg">Invalid key or expired license!</div>
+
+        <!-- WhatsApp Contact Section -->
+        <div class="whatsapp-contact">
+            <p>Need an Activation Key?</p>
+            <a href="https://wa.me/919096214201?text=Hello%20Javed%20Bhai,%20I%20want%20an%20activation%20key%20for%20ChickenMGR." target="_blank" class="whatsapp-btn">
+                💬 Contact on WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Agar app pehle se activated hai, toh dobara key nahi maangega, seedha dashboard kholega
+        if(localStorage.getItem('kcc_activated') === 'true') {
+            window.location.href = 'dashboard.html';
+        }
+
+        async function verifyKey() {
+            let keyInput = document.getElementById('activationKey').value.trim();
+            let errorMsg = document.getElementById('errorMsg');
+            let loadingMsg = document.getElementById('loadingMsg');
+
+            if(!keyInput) {
+                errorMsg.innerText = "Please enter activation key!";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            errorMsg.style.display = "none";
+            loadingMsg.style.display = "block";
+
+            let webAppUrl = "https://script.google.com/macros/s/AKfycbwhoY-dmLiDryhAm9H-rx8xgj_cO_2b302zSggGfoEXHsvgpvbmenIGdTwSOIBljYMd/exec"; 
+
+            try {
+                let response = await fetch(webAppUrl, {
+                    method: "POST",
+                    body: JSON.stringify({ key: keyInput })
+                });
+                
+                let resultText = await response.text();
+                loadingMsg.style.display = "none";
+
+                // Agar Google Sheet se SUCCESS aaya to activate karke Setup par bhej do
+                if(resultText.trim() === "SUCCESS") {
+                    localStorage.setItem('kcc_activated', 'true');
+                    window.location.href = 'setup.html';
+                } else {
+                    errorMsg.innerText = "Invalid Key or Expired License!";
+                    errorMsg.style.display = "block";
+                }
+
+            } catch (error) {
+                loadingMsg.style.display = "none";
+                errorMsg.innerText = "Connection Error! Check internet.";
+                errorMsg.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

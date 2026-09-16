@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chicken Shop MGR - Settings</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#128161">
+
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f4fbf8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
+        
+        .setup-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; border-top: 6px solid #128161; border: 1px solid #d4ece3; }
+        
+        .profile-container { position: relative; width: 75px; height: 75px; margin: 0 auto 8px auto; cursor: pointer; }
+        .profile-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #128161; background: #e0e0e0; }
+        .camera-badge { position: absolute; bottom: 0; right: 0; background: #128161; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; font-size: 12px; border: 2px solid white; }
+        
+        h2 { color: #128161; margin: 0 0 2px 0; font-size: 18px; }
+        p.sub { color: #666; font-size: 11px; margin-bottom: 12px; }
+        
+        label { font-size: 11px; font-weight: bold; color: #333; display: block; margin-top: 8px; text-align: left; }
+        input, select { width: 100%; padding: 8px; margin-top: 3px; border: 1px solid #d4ece3; border-radius: 6px; font-size: 12px; background: #fdfefe; outline: none; }
+        input:focus, select:focus { border-color: #128161; }
+        
+        button { background: #128161; color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        button:hover { background: #0e664d; }
+
+        .back-link { display: block; margin-top: 15px; font-size: 11px; color: #666; text-decoration: none; font-weight: bold; }
+        .back-link:hover { color: #128161; }
+    </style>
+</head>
+<body>
+    <div class="setup-card">
+        <div class="profile-container" onclick="document.getElementById('fileInput').click()">
+            <img id="profilePreview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23aaa'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Default Avatar">
+            <div class="camera-badge">📷</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
+
+        <h2>Shop Settings</h2>
+        <p class="sub">Update your shop details</p>
+        
+        <label>Shop Name:</label>
+        <input type="text" id="shopName" placeholder="Enter Shop Name" autocomplete="off">
+        
+        <label>Owner Name:</label>
+        <input type="text" id="ownerName" placeholder="Enter Owner Name" autocomplete="off">
+        
+        <label>Mobile Number:</label>
+        <input type="tel" id="mobileNumber" placeholder="Enter Mobile Number" autocomplete="off">
+        
+        <button onclick="saveSettings()">Save Changes</button>
+
+        <!-- Data Restore Section Only -->
+        <div style="margin-top: 18px; border-top: 1px dashed #d4ece3; padding-top: 12px; text-align: left;">
+            
+            <!-- Restore Toggle Link -->
+            <div style="margin-top: 5px; text-align: center;">
+                <a href="javascript:void(0);" onclick="toggleRestoreBox()" style="font-size: 11px; color: #d9534f; font-weight: bold; text-decoration: none;">
+                    ⚠️ Data Loss? Click Here to Restore Backup
+                </a>
+            </div>
+            
+            <!-- Restore Box Container -->
+            <div id="restoreBox" style="display: none; margin-top: 10px; background: #f9fdfc; padding: 10px; border-radius: 6px; border: 1px solid #d4ece3;">
+                <p style="font-size: 10px; color: #555; margin: 0 0 5px 0;">WhatsApp ya phone se mili `.json` file select karein:</p>
+                <input type="file" id="backupFileInp" accept=".json" style="margin-bottom: 8px; padding: 5px;">
+                <button onclick="restoreBackupFile()" style="background: #d9534f; margin-top: 0; padding: 8px; font-size: 12px;">Restore Data Now</button>
+            </div>
+        </div>
+
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        let base64Image = "";
+
+        window.onload = function() {
+            let pic = localStorage.getItem('chicken_pic');
+            if(pic) {
+                base64Image = pic;
+                document.getElementById('profilePreview').src = pic;
+            }
+            
+            let savedShop = localStorage.getItem('chicken_shop');
+            if(savedShop) document.getElementById('shopName').value = savedShop;
+
+            let savedOwner = localStorage.getItem('chicken_owner');
+            if(savedOwner) document.getElementById('ownerName').value = savedOwner;
+
+            let savedMobile = localStorage.getItem('chicken_mobile');
+            if(savedMobile) document.getElementById('mobileNumber').value = savedMobile;
+        }
+
+        function previewImage(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    base64Image = e.target.result;
+                    document.getElementById('profilePreview').src = base64Image;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveSettings() {
+            let shop = document.getElementById('shopName').value.trim();
+            let owner = document.getElementById('ownerName').value.trim();
+            let mobile = document.getElementById('mobileNumber').value.trim();
+
+            if(!shop || !owner) {
+                alert('Shop Name aur Owner Name bharna zaroori hai!');
+                return;
+            }
+
+            localStorage.setItem('chicken_shop', shop);
+            localStorage.setItem('chicken_owner', owner);
+            localStorage.setItem('chicken_mobile', mobile);
+            
+            if(base64Image) {
+                localStorage.setItem('chicken_pic', base64Image);
+            }
+
+            alert('Settings Updated Successfully!');
+            window.location.href = 'dashboard.html';
+        }
+
+        function toggleRestoreBox() {
+            let box = document.getElementById('restoreBox');
+            if (box.style.display === 'none') {
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        function restoreBackupFile() {
+            const fileInput = document.getElementById('backupFileInp');
+            
+            if (fileInput.files.length === 0) {
+                alert('Pehle backup `.json` file select karein!');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const fileContent = e.target.result;
+                    const parsedData = JSON.parse(fileContent);
+
+                    if (typeof parsedData === 'object' && parsedData !== null) {
+                        for (let key in parsedData) {
+                            let val = parsedData[key];
+                            if (typeof val === 'object') {
+                                localStorage.setItem(key, JSON.stringify(val));
+                            } else {
+                                localStorage.setItem(key, val);
+                            }
+                        }
+                    }
+
+                    alert('Aapka data successfully restore ho gaya hai!');
+                    location.reload();
+                    
+                } catch (error) {
+                    alert('Yeh file galat hai ya corrupt ho chuki hai!');
+                }
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>

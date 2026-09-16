@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Chicken Shop MGR - Daily Collection</title>
+
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#128161">
+
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+       body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: #f4fbf8; 
+            margin: 0; 
+            padding-bottom: 110px; /* Isko 90px se badha kar 110px kar dein */
+            opacity: 0; 
+            animation: fadeInPage 0.2s ease-in-out forwards; 
+            min-height: 100vh; 
+            display: flex;     
+            flex-direction: column; 
+        }
+        
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard Exact Header Style */
+        header { background: #128161; color: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: none; position: sticky; top: 0; z-index: 999; width: 100%; }
+        .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+        header img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; margin-right: 12px; background: #ddd; flex-shrink: 0; }
+        .shop-info { min-width: 0; overflow: hidden; }
+        .shop-info h2 { margin: 0; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+        .shop-info p { margin: 2px 0 0 0; font-size: 11px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .header-right-tools { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .lang-select { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; outline: none; }
+        .lang-select option { color: #333; }
+
+        .setting-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 18px; padding: 6px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .setting-btn:hover { background: rgba(255,255,255,0.3); }
+
+        .container { 
+            padding: 10px; 
+            max-width: 450px; 
+            margin: auto; 
+            flex: 1;
+            width: 100%; 
+        }
+
+        .top-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+        .page-title { font-size: 14px; font-weight: bold; color: #333; margin: 0; }
+        
+        .action-controls { display: flex; align-items: center; gap: 6px; }
+        
+        /* Compact Month Selector */
+        .month-selector { 
+            padding: 5px 8px; 
+            border: 1px solid #d4ece3; 
+            border-radius: 6px; 
+            font-size: 11px; 
+            font-weight: bold; 
+            background: white; 
+            color: #333; 
+            outline: none; 
+            cursor: pointer; 
+            width: 120px; 
+            direction: ltr !important; 
+            unicode-bidi: embed; 
+        }
+
+        .add-account-btn { background: #128161; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .add-account-btn:hover { background: #0e664d; }
+
+        /* Summary Cards Grid - Compact Udhar Style (2 columns) */
+        .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+        
+        .col-card { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 4px solid #128161; position: relative; }
+        .col-card.online { border-left-color: #2980b9; }
+        .col-card.udhar { border-left-color: #d9534f; }
+        .col-card.total { border-left-color: #f39c12; background: linear-gradient(135deg, #fef9e7, #fcf3cf); }
+
+        .col-card h3 { margin: 0 0 4px 0; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-card .amount { font-size: 14px; font-weight: bold; color: #333; margin: 0; }
+        .col-card.total .amount { color: #d68910; }
+        .col-card.udhar .amount { color: #d9534f; }
+        .col-card span.icon { position: absolute; right: 10px; top: 10px; font-size: 18px; opacity: 0.4; }
+
+        /* Recent Transactions Section */
+        .section-header { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .history-container { background: white; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow-x: auto; margin-bottom: 10px; border: 1px solid #d4ece3; }
+        .history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 11px; white-space: nowrap; }
+        .history-table th { background: #f4fbf8; color: #128161; padding: 8px 10px; border-bottom: 2px solid #d4ece3; }
+        .history-table td { padding: 8px 10px; border-bottom: 1px solid #eee; color: #444; }
+
+        /* Delete Button */
+        .del-btn { background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        .del-btn:hover { background: #c0392b; }
+
+        /* Modals / Popups */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-box { background: white; padding: 15px; border-radius: 10px; width: 90%; max-width: 320px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-box h3 { margin-top: 0; font-size: 14px; color: #128161; margin-bottom: 10px; }
+        .modal-input { width: 100%; padding: 8px; border: 1px solid #d4ece3; border-radius: 5px; font-size: 11px; margin-bottom: 10px; box-sizing: border-box; outline: none; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 8px; }
+
+        .btn-green { background: #128161; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-gray { background: #7f8c8d; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-green:hover { background: #0e664d; }
+        .btn-gray:hover { background: #6c7a89; }
+
+        /* Modern Bottom Navigation Bar with Vector Icons */
+       body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: #f4fbf8; 
+            margin: 0; 
+            padding-bottom: 110px; /* Isko 90px se badha kar 110px kar dein */
+            opacity: 0; 
+            animation: fadeInPage 0.2s ease-in-out forwards; 
+            min-height: 100vh; 
+            display: flex;     
+            flex-direction: column; 
+        }
+
+        /* Modern Floating Footer / Bottom Navigation */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 70px; 
+            background: #ffffff; 
+            display: flex; 
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08); 
+            border-top: 2px solid #d4ece3; 
+            z-index: 99999; /* Isko high rakhein taki browser bar ke upar rahe */
+        }
+        .nav-item { 
+            flex: 1; 
+            text-align: center; 
+            padding: 6px 0; 
+            text-decoration: none; 
+            color: #555555; 
+            font-size: 12px; 
+            font-weight: 700; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            transition: all 0.2s ease; 
+        }
+
+        .nav-item svg {
+            width: 26px;
+            height: 26px;
+            margin-bottom: 3px;
+            fill: #666666;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active { 
+            color: #128161; 
+        }
+
+        .nav-item.active svg {
+            fill: #128161;
+            transform: translateY(-2px);
+        }
+
+        .nav-item:hover {
+            color: #128161;
+        }
+        .nav-item:hover svg {
+            fill: #128161;
+        }
+
+        /* Center Elevated MGR Button */
+        .voice-center-container {
+            position: relative;
+            top: -22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            flex: 1;
+        }
+.voice-round-btn { 
+    width: 58px; 
+    height: 58px; 
+    border-radius: 50%; 
+    background: #128161; 
+    border: 3px solid #ffffff; 
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(18, 129, 97, 0.45); 
+    cursor: pointer; 
+    display: flex;
+    align-items: center;
+    justify-name: center;
+}
+.voice-round-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.voice-glow-ring { 
+    position: absolute; 
+    width: 68px; 
+    height: 68px; 
+    border-radius: 50%; 
+    background: rgba(18, 129, 97, 0.25); 
+    animation: pulse-glow 2s infinite; 
+    z-index: -1; 
+}
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* Voice Listening Popup Overlay */
+        #voiceModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            font-family: inherit;
+        }
+        .voice-popup-box {
+            background: white;
+            color: #333;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .mic-wave {
+            font-size: 40px;
+            margin-bottom: 10px;
+            animation: bounceMic 1s infinite alternate;
+        }
+        @keyframes bounceMic {
+            from { transform: translateY(0); }
+            to { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Voice Listening Modal Popup -->
+    <div id="voiceModal">
+        <div class="voice-popup-box">
+            <div class="mic-wave">🎙️</div>
+            <h3 style="margin: 0 0 8px 0; color: #128161;">MGR Sun Raha Hai...</h3>
+            <p id="speechStatusText" style="font-size: 13px; color: #666; margin: 0 0 15px 0;">Hey MGR, boliye kya karna hai?</p>
+            <button onclick="stopVoiceAssistant()" style="background: #ff4757; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">Band Karein</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <img id="headerImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Profile">
+            <div class="shop-info">
+                <h2 id="headerShop">कदीर चिकन सेंटर (KCC)</h2>
+                <p id="headerOwner">Owner: Javed Bhai</p>
+            </div>
+        </div>
+        
+        <div class="header-right-tools">
+            <select id="langSwitch" class="lang-select" onchange="changeLanguage(this.value)">
+                <option value="en" style="color: #333;">English</option>
+                <option value="hi" style="color: #333;">हिन्दी</option>
+                <option value="ar" style="color: #333;">العربية</option>
+            </select>
+           
+            <a href="settings.html" class="setting-btn" title="Settings">⚙️</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Back to Dashboard Button -->
+        <div style="margin-bottom: 10px;">
+            <a href="dashboard.html" id="btnBack" style="display: inline-flex; align-items: center; gap: 4px; background: #fff; color: #128161; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #128161;">
+                ⬅️ Back to Dashboard
+            </a>
+        </div>
+        
+        <div class="top-action-bar">
+            <div class="page-title" id="txtPageTitle">Monthly Collection</div>
+            <div class="action-controls">
+                <!-- Month Selector -->
+                <input type="month" id="monthSelector" class="month-selector" onchange="loadMonthlySummary()">
+                <button class="add-account-btn" id="btnAddEntry" onclick="openAddModal()">➕ Add</button>
+            </div>
+        </div>
+
+        <!-- Summary Cards Grid (Month-wise totals) -->
+        <div class="collection-grid">
+            
+            <!-- 1. Month Cash Collection -->
+            <div class="col-card">
+                <h3 id="lblCashTitle">Cash</h3>
+                <div class="amount" id="monthCashAmt">₹0.00</div>
+                <span class="icon">💵</span>
+            </div>
+
+            <!-- 2. Month Online Collection -->
+            <div class="col-card online">
+                <h3 id="lblOnlineTitle">Online</h3>
+                <div class="amount" id="monthOnlineAmt">₹0.00</div>
+                <span class="icon">📱</span>
+            </div>
+
+            <!-- 3. Month Udhar -->
+            <div class="col-card udhar">
+                <h3 id="lblUdharTitle">Udhar</h3>
+                <div class="amount" id="monthUdharAmt">₹0.00</div>
+                <span class="icon">📒</span>
+            </div>
+
+            <!-- 4. Month Total Collection -->
+            <div class="col-card total">
+                <h3 id="lblTotalTitle">Total Sale</h3>
+                <div class="amount" id="monthTotalAmt">₹0.00</div>
+                <span class="icon">📊</span>
+            </div>
+
+        </div>
+
+        <!-- Transactions Log Table -->
+        <div class="section-header" id="lblLogTitle">Entries Log</div>
+        <div class="history-container">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th id="thDate">Date</th>
+                        <th id="thCash">Cash (₹)</th>
+                        <th id="thOnline">Online (₹)</th>
+                        <th id="thUdhar">Udhar (₹)</th>
+                        <th id="thTotal">Total (₹)</th>
+                        <th id="thAction">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="todayTableBody">
+                    <!-- Dynamic rows -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- MODAL: FORM -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-box">
+            <h3 id="lblModalTitle">Add Collection Entry</h3>
+            
+            <label style="font-size:11px; color:#555;" id="lblDate">Date:</label>
+            <input type="date" id="formDate" class="modal-input">
+
+            <label style="font-size:11px; color:#555;" id="lblCashInput">Cash Amount (₹):</label>
+            <input type="number" step="0.01" id="formCash" class="modal-input" placeholder="Enter Cash Amount">
+
+            <label style="font-size:11px; color:#555;" id="lblOnlineInput">Online Amount (₹):</label>
+            <input type="number" step="0.01" id="formOnline" class="modal-input" placeholder="Enter Online Amount">
+
+            <label style="font-size:11px; color:#555;" id="lblUdharInput">Udhar Amount (₹):</label>
+            <input type="number" step="0.01" id="formUdhar" class="modal-input" placeholder="Enter Udhar Amount">
+
+            <div class="modal-buttons">
+                <button class="btn-gray" id="btnCancel" onclick="closeAddModal()">Cancel</button>
+                <button class="btn-green" id="btnSave" onclick="saveFormEntry()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Bottom Navigation Bar with Center MGR Button -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item" id="navDash">
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <span id="txtDash">Dashboard</span>
+        </a>
+        <a href="udhar.html" class="nav-item" id="navUdhar">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            <span id="txtUdhar">Udhar</span>
+        </a>
+
+        <!-- Center Elevated MGR Button -->
+     <a href="about.html" class="voice-center-container" title="About App">
+    <div class="voice-glow-ring"></div>
+    <button class="voice-round-btn">
+        <img src="logo.png" alt="App Info">
+    </button>
+</a>
+
+        <a href="traders.html" class="nav-item" id="navTraders">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <span id="txtTraders">Traders</span>
+        </a>
+        <a href="collection.html" class="nav-item active" id="navCollection">
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            <span id="txtCollection">Collection</span>
+        </a>
+    </nav>
+
+    <script>
+        const translations = {
+            en: {
+                back: "⬅️ Back",
+                title: "Monthly Collection",
+                addBtn: "➕ Add",
+                logTitle: "Entries Log",
+                thDate: "Date",
+                thCash: "Cash",
+                thOnline: "Online",
+                thUdhar: "Udhar",
+                thTotal: "Total",
+                thAction: "Action",
+                modalTitle: "Add Collection Entry",
+                lblDate: "Date:",
+                lblCashInput: "Cash Amount (₹):",
+                lblOnlineInput: "Online Amount (₹):",
+                lblUdharInput: "Udhar Amount (₹):",
+                btnCancel: "Cancel",
+                btnSave: "Save",
+                delBtn: "Delete",
+                navDash: "Dashboard",
+                navUdhar: "Udhar",
+                navTraders: "Traders",
+                navCollection: "Collection",
+                noRecords: "No records found for this month."
+            },
+            hi: {
+                back: "⬅️ वापस",
+                title: "मासिक कलेक्शन",
+                addBtn: "➕ जोड़ें",
+                logTitle: "एंट्री लॉग",
+                thDate: "दिनांक",
+                thCash: "नकद",
+                thOnline: "ऑनलाइन",
+                thUdhar: "उधार",
+                thTotal: "कुल",
+                thAction: "एक्शन",
+                modalTitle: "कलेक्शन एंट्री जोड़ें",
+                lblDate: "दिनांक:",
+                lblCashInput: "नकद राशि (₹):",
+                lblOnlineInput: "ऑनलाइन राशि (₹):",
+                lblUdharInput: "उधार राशि (₹):",
+                btnCancel: "रद्द करें",
+                btnSave: "सेव करें",
+                delBtn: "हटाएं",
+                navDash: "डैशबोर्ड",
+                navUdhar: "उधार",
+                navTraders: "ट्रेडर्स",
+                navCollection: "कलेक्शन",
+                noRecords: "इस महीने का कोई रिकॉर्ड नहीं मिला।"
+            },
+            ar: {
+                back: "⬅️ عودة",
+                title: "التحصيل الشهري",
+                addBtn: "➕ إضافة",
+                logTitle: "سجل المدخلات",
+                thDate: "التاريخ",
+                thCash: "نقدي",
+                thOnline: "إلكتروني",
+                thUdhar: "دين",
+                thTotal: "الإجمالي",
+                thAction: "إجراء",
+                modalTitle: "إضافة إدخال تحصيل",
+                lblDate: "التاريخ:",
+                lblCashInput: "المبلغ النقدي (₹):",
+                lblOnlineInput: "المبلغ الإلكتروني (₹):",
+                lblUdharInput: "مبلغ الدين (₹):",
+                btnCancel: "إلغاء",
+                btnSave: "حفظ",
+                delBtn: "حذف",
+                navDash: "لوحة التحكم",
+                navUdhar: "الديون",
+                navTraders: "الموردين",
+                navCollection: "التحصيل",
+                noRecords: "لا توجد سجلات لهذا الشهر."
+            }
+        };
+
+        let recognitionInstance = null;
+
+        window.onload = function() {
+            let shop = localStorage.getItem('chicken_shop');
+            let owner = localStorage.getItem('chicken_owner');
+            let pic = localStorage.getItem('chicken_pic');
+
+            if(shop) document.getElementById('headerShop').innerText = shop;
+            if(owner) document.getElementById('headerOwner').innerText = 'Owner: ' + owner;
+            if(pic) document.getElementById('headerImg').src = pic;
+
+            let savedLang = localStorage.getItem('chicken_lang') || 'en';
+            document.getElementById('langSwitch').value = savedLang;
+            setLanguage(savedLang);
+
+            let monthInput = document.getElementById('monthSelector');
+            if(!monthInput.value) {
+                let now = new Date();
+                let year = now.getFullYear();
+                let month = String(now.getMonth() + 1).padStart(2, '0');
+                monthInput.value = `${year}-${month}`;
+            }
+
+            loadMonthlySummary();
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log("Service Worker Registered Successfully"));
+            }
+        }
+
+        /* MGR Voice Assistant Engine */
+/* MGR Voice Assistant Engine */
+        function startVoiceAssistant() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Aapka browser voice recognition support nahi karta. Kripya Google Chrome use karein.");
+                return;
+            }
+
+            if (recognitionInstance) {
+                try { recognitionInstance.stop(); } catch(e) {}
+                recognitionInstance = null;
+            }
+
+            document.getElementById('voiceModal').style.display = 'flex';
+            document.getElementById('speechStatusText').innerText = "Hey MGR sun raha hai, boliye...";
+
+            try {
+                recognitionInstance = new SpeechRecognition();
+                recognitionInstance.lang = 'hi-IN';
+                recognitionInstance.interimResults = true;
+                recognitionInstance.maxAlternatives = 1;
+
+                recognitionInstance.onresult = function(event) {
+                    let speechText = event.results[0][0].transcript.toLowerCase();
+                    document.getElementById('speechStatusText').innerText = "Suna gaya: " + speechText;
+                    
+                    if (event.results[0].isFinal) {
+                        setTimeout(() => {
+                            document.getElementById('voiceModal').style.display = 'none';
+                            processMGRCommand(speechText);
+                        }, 600);
+                    }
+                };
+
+                recognitionInstance.onerror = function(event) {
+                    console.log("Speech warning/error:", event.error);
+                    if(event.error === 'no-speech' || event.error === 'aborted') {
+                        document.getElementById('speechStatusText').innerText = "Awaz nahi aayi, fir se boliye...";
+                        return;
+                    }
+                    document.getElementById('speechStatusText').innerText = "Mic error: " + event.error;
+                    setTimeout(() => {
+                        document.getElementById('voiceModal').style.display = 'none';
+                    }, 1500);
+                };
+
+                recognitionInstance.onend = function() {
+                    recognitionInstance = null;
+                };
+
+                recognitionInstance.start();
+            } catch(e) {
+                console.error(e);
+                document.getElementById('voiceModal').style.display = 'none';
+                alert("Microphone shuru karne mein samasya aayi. Check karein ki site HTTPS par chal rahi hai ya nahi.");
+            }
+        }
+
+        function stopVoiceAssistant() {
+            if(recognitionInstance) recognitionInstance.stop();
+            document.getElementById('voiceModal').style.display = 'none';
+        }
+
+        function processMGRCommand(text) {
+            let cleanText = text.toLowerCase().replace(/hey mgr|mgr|hi mgr|hai/g, "").trim();
+            
+            // 1. Agar naya account ya customer banane ki baat ho
+            if (cleanText.includes('naya') || cleanText.includes('new') || cleanText.includes('account') || cleanText.includes('khata')) {
+                let name = cleanText.replace(/naya|new|account|khata|banao|bana|karo|ka|ki/g, "").trim();
+                name = name.charAt(0).toUpperCase() + name.slice(1);
+                window.location.href = `udhar.html?new_account=${encodeURIComponent(name)}`;
+                return;
+            }
+
+            // 2. Agar Jama / Payment lene ki baat ho
+            if (cleanText.includes('jama') || cleanText.includes('mil gaya') || cleanText.includes('aaye') || cleanText.includes('payment')) {
+                let amountMatch = cleanText.match(/\d+/);
+                let amount = amountMatch ? amountMatch[0] : "0";
+                let name = cleanText.replace(/jama|mil gaya|aaye|payment|rupay|rupees|rs|karo|ka|ki|ke/g, "").replace(amount, "").trim();
+                name = name.charAt(0).toUpperCase() + name.slice(1);
+                window.location.href = `udhar.html?jama_name=${encodeURIComponent(name)}&amount=${amount}`;
+                return;
+            }
+
+            // 3. Agar Udhar add karne ki baat ho
+            if (cleanText.includes('add') || cleanText.includes('likho') || cleanText.includes('udhar') || cleanText.includes('udhari')) {
+                let amountMatch = cleanText.match(/\d+/);
+                let amount = amountMatch ? amountMatch[0] : "0";
+                let name = cleanText.replace(/ki|ka|ke|rupay|rupees|rs|udhari|udhar|add|karo|likho/g, "").replace(amount, "").trim();
+                if(!name) name = "Customer";
+                name = name.charAt(0).toUpperCase() + name.slice(1);
+                window.location.href = `udhar.html?add_name=${encodeURIComponent(name)}&amount=${amount}`;
+                return;
+            }
+
+            // 4. Agar Trader se judi baat ho
+            if (cleanText.includes('trader') || cleanText.includes('maal') || cleanText.includes('party')) {
+                window.location.href = `traders.html?search=${encodeURIComponent(cleanText)}`;
+                return;
+            }
+
+            // Default: Agar sirf naam ya search ho
+            window.location.href = `udhar.html?search=${encodeURIComponent(cleanText)}`;
+        }
+       
+
+ function changeLanguage(lang) {
+            localStorage.setItem('chicken_lang', lang);
+            setLanguage(lang);
+            loadMonthlySummary();
+        }
+
+        function setLanguage(lang) {
+            let t = translations[lang] || translations.en;
+            
+            document.getElementById('btnBack').innerText = t.back;
+            document.getElementById('txtPageTitle').innerText = t.title;
+            document.getElementById('btnAddEntry').innerText = t.addBtn;
+            document.getElementById('lblLogTitle').innerText = t.logTitle;
+
+            document.getElementById('thDate').innerText = t.thDate;
+            document.getElementById('thCash').innerText = t.thCash;
+            document.getElementById('thOnline').innerText = t.thOnline;
+            document.getElementById('thUdhar').innerText = t.thUdhar;
+            document.getElementById('thTotal').innerText = t.thTotal;
+            document.getElementById('thAction').innerText = t.thAction;
+
+            document.getElementById('lblModalTitle').innerText = t.modalTitle;
+            document.getElementById('lblDate').innerText = t.lblDate;
+            document.getElementById('lblCashInput').innerText = t.lblCashInput;
+            document.getElementById('lblOnlineInput').innerText = t.lblOnlineInput;
+            document.getElementById('lblUdharInput').innerText = t.lblUdharInput;
+            document.getElementById('btnCancel').innerText = t.btnCancel;
+            document.getElementById('btnSave').innerText = t.btnSave;
+
+            document.getElementById('txtDash').innerText = t.navDash;
+            document.getElementById('txtUdhar').innerText = t.navUdhar;
+            document.getElementById('txtTraders').innerText = t.navTraders;
+            document.getElementById('txtCollection').innerText = t.navCollection;
+
+            if(lang === 'ar') {
+                document.dir = 'rtl';
+            } else {
+                document.dir = 'ltr';
+            }
+        }
+
+        function openAddModal() {
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('formDate').value = today;
+            document.getElementById('formCash').value = '';
+            document.getElementById('formOnline').value = '';
+            document.getElementById('formUdhar').value = '';
+            document.getElementById('addModal').style.display = 'flex';
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        function saveFormEntry() {
+            let date = document.getElementById('formDate').value;
+            let cash = parseFloat(document.getElementById('formCash').value) || 0;
+            let online = parseFloat(document.getElementById('formOnline').value) || 0;
+            let udhar = parseFloat(document.getElementById('formUdhar').value) || 0;
+            let totalSale = cash + online;
+
+            if(!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            let records = JSON.parse(localStorage.getItem('chicken_daily_records') || '[]');
+            let newEntry = {
+                date: date,
+                cash: cash,
+                online: online,
+                udhar: udhar,
+                totalSale: totalSale
+            };
+            records.push(newEntry);
+
+            localStorage.setItem('chicken_daily_records', JSON.stringify(records));
+            syncToSheet("Collection", [date, cash, online, udhar, totalSale]);
+            
+            document.getElementById('monthSelector').value = date.substring(0, 7);
+
+            closeAddModal();
+            loadMonthlySummary();
+        }
+
+        function deleteRecord(index) {
+            let lang = localStorage.getItem('chicken_lang') || 'en';
+            let msg = lang === 'hi' ? "क्या आप सच में ये एंट्री डिलीट करना चाहते हैं?" : (lang === 'ar' ? "هل أنت متأكد أنك تريد حذف هذا الإدخال؟" : "Are you sure you want to delete this entry?");
+            
+            if(confirm(msg)) {
+                let records = JSON.parse(localStorage.getItem('chicken_daily_records') || '[]');
+                let deletedItem = records.splice(index, 1)[0];
+                localStorage.setItem('chicken_daily_records', JSON.stringify(records));
+
+                syncToSheet("Collection", [deletedItem.date, -deletedItem.cash, -deletedItem.online, -deletedItem.udhar, -deletedItem.totalSale]);
+
+                loadMonthlySummary();
+            }
+        }
+
+        function loadMonthlySummary() {
+            let selectedMonth = document.getElementById('monthSelector').value; 
+            let records = JSON.parse(localStorage.getItem('chicken_daily_records') || '[]');
+            let lang = localStorage.getItem('chicken_lang') || 'en';
+            let t = translations[lang] || translations.en;
+            
+            let monthCash = 0;
+            let monthOnline = 0;
+            let monthUdhar = 0;
+
+            let tbody = document.getElementById('todayTableBody');
+            tbody.innerHTML = '';
+
+            let filteredRecords = records.filter(item => item.date && item.date.startsWith(selectedMonth));
+
+            if(filteredRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#777; padding: 12px;">${t.noRecords}</td></tr>`;
+            }
+
+            filteredRecords.forEach((item, originalIndex) => {
+                let c = parseFloat(item.cash) || 0;
+                let o = parseFloat(item.online) || 0;
+                let u = parseFloat(item.udhar) || 0;
+                let tSale = item.totalSale !== undefined ? item.totalSale : (c + o);
+
+                monthCash += c;
+                monthOnline += o;
+                monthUdhar += u;
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.date}</td>
+                    <td style="color:#128161; font-weight:bold;">₹${c.toFixed(2)}</td>
+                    <td style="color:#2980b9; font-weight:bold;">₹${o.toFixed(2)}</td>
+                    <td style="color:#d9534f; font-weight:bold;">₹${u.toFixed(2)}</td>
+                    <td style="color:#d68910; font-weight:bold;">₹${tSale.toFixed(2)}</td>
+                    <td><button class="del-btn" onclick="deleteRecord(${originalIndex})">${t.delBtn}</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            let monthTotal = monthCash + monthOnline;
+
+            document.getElementById('monthCashAmt').innerText = '₹' + monthCash.toFixed(2);
+            document.getElementById('monthOnlineAmt').innerText = '₹' + monthOnline.toFixed(2);
+            document.getElementById('monthUdharAmt').innerText = '₹' + monthUdhar.toFixed(2);
+            document.getElementById('monthTotalAmt').innerText = '₹' + monthTotal.toFixed(2);
+        }
+
+        async function syncToSheet(sheetName, rowData) {
+            let sheetUrl = localStorage.getItem('chicken_deploy');
+            if (sheetUrl && sheetUrl.startsWith('http')) {
+                try {
+                    await fetch(sheetUrl, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ sheetName: sheetName, row: rowData })
+                    });
+                } catch (error) { console.error("Sync failed:", error); }
+            }
+        }
+    </script>
+</body>
+</html>
