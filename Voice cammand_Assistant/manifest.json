@@ -1,0 +1,22 @@
+{
+  "name": "Chicken Shop MGR",
+  "short_name": "ChickenMGR",
+  "start_url": "dashboard.html",
+  "display": "standalone",
+  "background_color": "#128161",
+  "theme_color": "#128161",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

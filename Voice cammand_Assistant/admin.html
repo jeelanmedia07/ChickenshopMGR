@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chicken Shop MGR - Admin Panel</title>
+    <meta name="theme-color" content="#128161">
+
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f4fbf8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
+        .admin-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; border-top: 6px solid #d9534f; border: 1px solid #d4ece3; }
+        h2 { color: #d9534f; margin: 0 0 5px 0; font-size: 20px; }
+        p.sub { color: #666; font-size: 12px; margin-bottom: 20px; }
+        h3 { color: #128161; margin: 15px 0 5px 0; font-size: 14px; text-align: left; border-top: 1px solid #d4ece3; padding-top: 10px; }
+        input[type="file"] { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #d4ece3; border-radius: 6px; font-size: 12px; background: #fdfefe; }
+        button { background: #128161; color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        button:hover { background: #0e664d; }
+        .btn-download { background: #2072b8; }
+        .btn-download:hover { background: #155a96; }
+        .back-link { display: block; margin-top: 15px; font-size: 12px; color: #666; text-decoration: none; font-weight: bold; }
+        .back-link:hover { color: #128161; }
+    </style>
+</head>
+<body>
+    <div class="admin-card">
+        <h2>Admin Backup Panel</h2>
+        <p class="sub">Manage system backups & user restorations</p>
+        
+        <!-- 1. Download Backup Section -->
+        <h3>1. Download System Backup</h3>
+        <p class="sub" style="margin-bottom: 5px; text-align: left;">Current browser/shop ka data backup (.json) file ke roop mein download karein:</p>
+        <button class="btn-download" onclick="downloadBackupJSON()">Download Backup (.json)</button>
+
+        <!-- 2. Restore Backup Section -->
+        <h3>2. Restore User Data</h3>
+        <p class="sub" style="margin-bottom: 5px; text-align: left;">Kisi user ki `.json` backup file yahan select karke restore karein:</p>
+        <input type="file" id="backupFileInp" accept=".json">
+        <button onclick="restoreBackupFile()">Restore Data to Browser</button>
+
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        // System ka poora data JSON mein download karne ka function
+        function downloadBackupJSON() {
+            let backupObj = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                backupObj[key] = localStorage.getItem(key);
+            }
+            
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+            let downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "chicken_shop_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Backup file ko wapas browser mein restore karne ka function
+        function restoreBackupFile() {
+            const fileInput = document.getElementById('backupFileInp');
+            
+            if (fileInput.files.length === 0) {
+                alert('Pehle backup (.json) file select karein!');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const fileContent = e.target.result;
+                    const parsedData = JSON.parse(fileContent);
+
+                    // Saari keys ko localStorage mein wapas dalna
+                    for (let key in parsedData) {
+                        localStorage.setItem(key, parsedData[key]);
+                    }
+
+                    alert('Data successfully restore ho gaya hai!');
+                    location.reload();
+                    
+                } catch (error) {
+                    alert('Yeh file galat hai ya corrupt ho chuki hai!');
+                }
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Chicken Shop MGR - Traders Management</title>
+
+     <!-- PWA Manifest Link -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#128161">
+
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: #f4fbf8; 
+            margin: 0; 
+            padding-bottom: 110px; /* Isko 90px se badha kar 110px kar dein */
+            opacity: 0; 
+            animation: fadeInPage 0.2s ease-in-out forwards; 
+            min-height: 100vh; 
+            display: flex;     
+            flex-direction: column; 
+        }
+        
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dashboard Exact Header Style */
+        header { background: #128161; color: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: none; position: sticky; top: 0; z-index: 999; width: 100%; }
+        .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+        header img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; margin-right: 12px; background: #ddd; flex-shrink: 0; }
+        .shop-info { min-width: 0; overflow: hidden; }
+        .shop-info h2 { margin: 0; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+        .shop-info p { margin: 2px 0 0 0; font-size: 11px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .setting-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 18px; padding: 6px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .setting-btn:hover { background: rgba(255,255,255,0.3); }
+        .lang-select { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; outline: none; }
+        .lang-select option { color: #333; }
+
+        .container { 
+            padding: 10px; 
+            max-width: 450px; 
+            margin: auto; 
+            flex: 1;
+            width: 100%; 
+        }
+
+        /* Top Action Bar */
+        .top-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+        .page-title { font-size: 14px; font-weight: bold; color: #333; margin: 0; }
+        .add-account-btn { background: #128161; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .add-account-btn:hover { background: #0e664d; }
+
+        /* Search Bar */
+        .search-bar-container { background: white; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border: 1px solid #d4ece3; }
+        .search-bar-container span { font-size: 14px; color: #777; }
+        .search-bar-container input { width: 100%; border: none; outline: none; font-size: 12px; color: #333; background: transparent; }
+
+        /* Trader Cards Grid - Optimized for Mobile */
+        .customers-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .customer-card { background: white; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); padding: 10px; position: relative; border-left: 4px solid #128161; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
+        .customer-card:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        
+        .card-top-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .customer-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #128161; background: #f4fbf8; flex-shrink: 0; }
+        
+        .card-info { min-width: 0; flex: 1; }
+        .customer-name { font-size: 12px; font-weight: bold; color: #222; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .customer-phone { font-size: 10px; color: #666; margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .card-footer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+        .customer-balance { font-size: 12px; font-weight: bold; color: #128161; }
+        .customer-balance.negative { color: #d9534f; }
+        
+        .delete-icon { background: none; border: none; color: #aaa; font-size: 13px; cursor: pointer; padding: 0; flex-shrink: 0; }
+        .delete-icon:hover { color: #d9534f; }
+
+        /* Detail View Section */
+        #detailView { display: none; }
+        .detail-header-card { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border: 1px solid #d4ece3; }
+        
+        .profile-social-box { display: flex; align-items: center; gap: 10px; }
+        .profile-social-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #128161; background: #f4fbf8; }
+        .detail-info h3 { margin: 0 0 2px 0; font-size: 14px; color: #333; }
+        .detail-info p { margin: 0; font-size: 11px; color: #666; }
+        
+        .detail-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        
+        .btn-green { background: #128161; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-gray { background: #7f8c8d; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-green:hover { background: #0e664d; }
+        .btn-gray:hover { background: #6c7a89; }
+
+        /* History Table / List */
+        .history-container { background: white; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow-x: auto; margin-bottom: 10px; border: 1px solid #d4ece3; }
+        .history-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 11px; white-space: nowrap; }
+        .history-table th { background: #f4fbf8; color: #128161; padding: 8px 10px; border-bottom: 2px solid #d4ece3; }
+        .history-table td { padding: 8px 10px; border-bottom: 1px solid #eee; color: #444; }
+        .action-btns { display: flex; gap: 4px; }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 12px; padding: 2px; }
+        .action-btn:hover { opacity: 0.7; }
+
+        /* Modals / Popups */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-box { background: white; padding: 15px; border-radius: 10px; width: 90%; max-width: 320px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-box h3 { margin-top: 0; font-size: 14px; color: #128161; margin-bottom: 10px; }
+        .modal-input { width: 100%; padding: 8px; border: 1px solid #d4ece3; border-radius: 5px; font-size: 11px; margin-bottom: 8px; box-sizing: border-box; outline: none; }
+        
+        /* Special Red Box styling for Total Remaining */
+        .red-box-container { background: #fdf2f2; border: 2px dashed #d9534f; padding: 8px; border-radius: 6px; margin-bottom: 10px; text-align: center; }
+        .red-box-container label { font-size: 11px; font-weight: bold; color: #d9534f; display: block; margin-bottom: 3px; }
+        .red-box-input { width: 100%; border: none; background: transparent; font-size: 16px; font-weight: bold; color: #d9534f; text-align: center; outline: none; }
+
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 8px; }
+
+        /* Modern Bottom Navigation Bar with Vector Icons */
+       .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 70px; 
+            background: #ffffff; 
+            display: flex; 
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08); 
+            border-top: 2px solid #d4ece3; 
+            z-index: 99999; /* Isko high rakhein taki browser bar ke upar rahe */
+        }
+
+        .nav-item { 
+            flex: 1; 
+            text-align: center; 
+            padding: 6px 0; 
+            text-decoration: none; 
+            color: #555555; 
+            font-size: 12px; 
+            font-weight: 700; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            transition: all 0.2s ease; 
+        }
+
+        .nav-item svg {
+            width: 26px;
+            height: 26px;
+            margin-bottom: 3px;
+            fill: #666666;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active { 
+            color: #128161; 
+        }
+
+        .nav-item.active svg {
+            fill: #128161;
+            transform: translateY(-2px);
+        }
+
+        .nav-item:hover {
+            color: #128161;
+        }
+        .nav-item:hover svg {
+            fill: #128161;
+        }
+
+        /* Center Elevated MGR Button */
+        .voice-center-container {
+            position: relative;
+            top: -22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            flex: 1;
+        }
+.voice-round-btn { 
+    width: 58px; 
+    height: 58px; 
+    border-radius: 50%; 
+    background: #128161; 
+    border: 3px solid #ffffff; 
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(18, 129, 97, 0.45); 
+    cursor: pointer; 
+    display: flex;
+    align-items: center;
+    justify-name: center;
+}
+.voice-round-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.voice-glow-ring { 
+    position: absolute; 
+    width: 68px; 
+    height: 68px; 
+    border-radius: 50%; 
+    background: rgba(18, 129, 97, 0.25); 
+    animation: pulse-glow 2s infinite; 
+    z-index: -1; 
+}
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* Voice Listening Popup Overlay */
+        #voiceModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            font-family: inherit;
+        }
+        .voice-popup-box {
+            background: white;
+            color: #333;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .mic-wave {
+            font-size: 40px;
+            margin-bottom: 10px;
+            animation: bounceMic 1s infinite alternate;
+        }
+        @keyframes bounceMic {
+            from { transform: translateY(0); }
+            to { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Voice Listening Modal Popup -->
+    <div id="voiceModal">
+        <div class="voice-popup-box">
+            <div class="mic-wave">🎙️</div>
+            <h3 style="margin: 0 0 8px 0; color: #128161;">MGR Sun Raha Hai...</h3>
+            <p id="speechStatusText" style="font-size: 13px; color: #666; margin: 0 0 15px 0;">Hey MGR, boliye kya karna hai?</p>
+            <button onclick="stopVoiceAssistant()" style="background: #ff4757; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">Band Karein</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <img id="headerImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Profile">
+            <div class="shop-info">
+                <h2 id="headerShop">Chicken Shop MGR</h2>
+                <p id="headerOwner">Owner: Javed Bhai</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <select class="lang-select" id="langSelect" onchange="changeLanguage()">
+                <option value="en">English</option>
+                <option value="mr">मराठी</option>
+                <option value="ar">العربية</option>
+            </select>
+            <a href="settings.html" class="setting-btn" title="Settings">⚙️</a>
+        </div>
+    </header>
+
+    <div class="container">
+<!-- Back to Dashboard Button -->
+    <div style="margin-bottom: 10px;">
+        <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 4px; background: #fff; color: #128161; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #128161;">
+            ⬅️ Back to Dashboard
+        </a>
+    </div>
+        
+        <!-- VIEW 1: TRADERS LIST -->
+        <div id="listView">
+            <div class="top-action-bar">
+                <h2 class="page-title" id="txtTradersTitle">Traders / Suppliers</h2>
+                <button class="add-account-btn" onclick="openAddAccountModal()">➕ <span id="txtAddAccount">Add New Account</span></button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar-container">
+                <span>🔍</span>
+                <input type="text" id="searchTraderInput" placeholder="Search Trader..." onkeyup="filterTraders()">
+            </div>
+
+            <!-- Trader Cards Container -->
+            <div class="customers-grid" id="tradersGridContainer">
+                <!-- Dynamic Cards will load here -->
+            </div>
+        </div>
+
+        <!-- VIEW 2: TRADER DETAIL & HISTORY -->
+        <div id="detailView">
+            <div class="detail-header-card">
+                <div class="profile-social-box">
+                    <div style="text-align: center;">
+                        <img id="detailTraderImg" src="" alt="Profile" class="profile-social-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23128161\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4 z\'/></svg>'">
+                        <br>
+                        <input type="file" id="updateTraderPicFile" accept="image/*" style="display: none;" onchange="updateTraderPhoto(this)">
+                        <button style="background: none; border: none; color: #128161; font-size: 9px; font-weight: bold; cursor: pointer; padding: 2px 0; text-decoration: underline;" onclick="document.getElementById('updateTraderPicFile').click()">📷 Edit Pic</button>
+                    </div>
+                    <div class="detail-info">
+                        <h3 id="detailTraderName">Trader Name</h3>
+                        <p id="detailTraderPhone">📱 9999999999</p>
+                    </div>
+                </div>
+                <div class="detail-actions">
+                    <button class="btn-green" onclick="openAddEntryModal()">➕ Add Entry</button>
+                    <button class="btn-gray" onclick="backToList()">⬅️ Back</button>
+                </div>
+            </div>
+
+            <!-- History Table -->
+            <div class="history-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Bird</th>
+                            <th>Weight</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                            <th>Maghil Baki</th>
+                            <th>Jama</th>
+                            <th>Remaining</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- History rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL: ADD NEW ACCOUNT -->
+    <div class="modal-overlay" id="addAccountModal">
+        <div class="modal-box">
+            <h3 id="txtModalAccTitle">Add New Trader Account</h3>
+            <input type="text" id="newTraderName" class="modal-input" placeholder="Trader Name">
+            <input type="tel" id="newTraderPhone" class="modal-input" placeholder="Mobile Number">
+            <label style="font-size: 10px; color: #666; display: block; margin-bottom: 2px; font-weight: bold;">Select Trader Photo:</label>
+            <input type="file" id="newTraderPicFile" class="modal-input" accept="image/*" style="padding: 5px;">
+            <div class="modal-buttons">
+                <button class="btn-gray" onclick="closeAddAccountModal()">Cancel</button>
+                <button class="btn-green" onclick="saveNewTrader()">Save Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT ENTRY -->
+    <div class="modal-overlay" id="addEntryModal">
+        <div class="modal-box">
+            <h3 id="entryModalTitle">Add Trader Transaction Entry</h3>
+            
+            <input type="hidden" id="editEntryIndex" value="-1">
+
+            <label style="font-size:11px; color:#555;">Date:</label>
+            <input type="date" id="entryDate" class="modal-input">
+            
+            <label style="font-size:11px; color:#555;">Bird (Count):</label>
+            <input type="number" id="entryBird" class="modal-input" placeholder="Number of Birds">
+            
+            <label style="font-size:11px; color:#555;">Weight (Kg):</label>
+            <input type="number" step="0.01" id="entryWeight" class="modal-input" placeholder="Total Weight in Kg" oninput="calculateAmount()">
+            
+            <label style="font-size:11px; color:#555;">Rate (₹ per Kg):</label>
+            <input type="number" step="0.01" id="entryRate" class="modal-input" placeholder="Rate per Kg" oninput="calculateAmount()">
+            
+            <label style="font-size:11px; color:#555;">Total Amount (₹):</label>
+            <input type="number" step="0.01" id="entryAmount" class="modal-input" placeholder="Total Amount" oninput="calculateRemaining()">
+            
+            <label style="font-size:11px; color:#555;">Maghil Baki (Previous Balance ₹):</label>
+            <input type="number" step="0.01" id="entryPrevBaki" class="modal-input" placeholder="Maghil Baki" oninput="calculateRemaining()">
+            
+            <label style="font-size:11px; color:#555;">Jama (Paid Amount ₹):</label>
+            <input type="number" step="0.01" id="entryJama" class="modal-input" placeholder="Jama / Paid Amount" oninput="calculateRemaining()">
+
+            <!-- Total Remaining in Red Box -->
+            <div class="red-box-container">
+                <label>Total Remaining (₹)</label>
+                <input type="text" id="entryRemaining" class="red-box-input" readonly value="0.00">
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn-gray" onclick="closeAddEntryModal()">Cancel</button>
+                <button class="btn-green" onclick="saveNewEntry()">Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Bottom Navigation Bar with Vector Icons & Center MGR Button -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item" id="navDash">
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <span id="txtDash">Dashboard</span>
+        </a>
+        <a href="udhar.html" class="nav-item" id="navUdhar">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            <span id="txtUdhar">Udhar</span>
+        </a>
+
+        <!-- Center Elevated MGR Button -->
+       <a href="about.html" class="voice-center-container" title="About App">
+    <div class="voice-glow-ring"></div>
+    <button class="voice-round-btn">
+        <img src="logo.png" alt="App Info">
+    </button>
+</a>
+
+        <a href="traders.html" class="nav-item active" id="navTraders">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <span id="txtTradersNav">Traders</span>
+        </a>
+        <a href="collection.html" class="nav-item" id="navCollection">
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            <span id="txtCollection">Collection</span>
+        </a>
+    </nav>
+
+    <script>
+        let currentTraderId = null;
+        let recognitionInstance = null;
+
+        window.onload = function() {
+            let shop = localStorage.getItem('chicken_shop');
+            let owner = localStorage.getItem('chicken_owner');
+            let pic = localStorage.getItem('chicken_pic');
+
+            if(shop) document.getElementById('headerShop').innerText = shop;
+            if(owner) document.getElementById('headerOwner').innerText = 'Owner: ' + owner;
+            if(pic) document.getElementById('headerImg').src = pic;
+
+            loadTraders();
+
+            let savedLang = localStorage.getItem('chicken_lang') || 'en';
+            document.getElementById('langSelect').value = savedLang;
+            applyLanguage(savedLang);
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log("Service Worker Registered Successfully"));
+            }
+        }
+
+        /* MGR Voice Assistant Engine */
+/* MGR Voice Assistant Engine */
+        function startVoiceAssistant() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Aapka browser voice recognition support nahi karta. Kripya Google Chrome use karein.");
+                return;
+            }
+
+            if (recognitionInstance) {
+                try { recognitionInstance.stop(); } catch(e) {}
+                recognitionInstance = null;
+            }
+
+            document.getElementById('voiceModal').style.display = 'flex';
+            document.getElementById('speechStatusText').innerText = "Hey MGR sun raha hai, boliye...";
+
+            try {
+                recognitionInstance = new SpeechRecognition();
+                recognitionInstance.lang = 'hi-IN';
+                recognitionInstance.interimResults = true;
+                recognitionInstance.maxAlternatives = 1;
+
+                recognitionInstance.onresult = function(event) {
+                    let speechText = event.results[0][0].transcript.toLowerCase();
+                    document.getElementById('speechStatusText').innerText = "Suna gaya: " + speechText;
+                    
+                    if (event.results[0].isFinal) {
+                        setTimeout(() => {
+                            document.getElementById('voiceModal').style.display = 'none';
+                            processMGRCommand(speechText);
+                        }, 600);
+                    }
+                };
+
+                recognitionInstance.onerror = function(event) {
+                    console.log("Speech warning/error:", event.error);
+                    if(event.error === 'no-speech' || event.error === 'aborted') {
+                        document.getElementById('speechStatusText').innerText = "Awaz nahi aayi, fir se boliye...";
+                        return;
+                    }
+                    document.getElementById('speechStatusText').innerText = "Mic error: " + event.error;
+                    setTimeout(() => {
+                        document.getElementById('voiceModal').style.display = 'none';
+                    }, 1500);
+                };
+
+                recognitionInstance.onend = function() {
+                    recognitionInstance = null;
+                };
+
+                recognitionInstance.start();
+            } catch(e) {
+                console.error(e);
+                document.getElementById('voiceModal').style.display = 'none';
+                alert("Microphone shuru karne mein samasya aayi. Check karein ki site HTTPS par chal rahi hai ya nahi.");
+            }
+        }
+
+       /* MGR Voice Assistant Engine */
+        function startVoiceAssistant() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Aapka browser voice recognition support nahi karta. Kripya Google Chrome use karein.");
+                return;
+            }
+
+            if (recognitionInstance) {
+                try { recognitionInstance.stop(); } catch(e) {}
+                recognitionInstance = null;
+            }
+
+            document.getElementById('voiceModal').style.display = 'flex';
+            document.getElementById('speechStatusText').innerText = "Hey MGR sun raha hai, boliye...";
+
+            try {
+                recognitionInstance = new SpeechRecognition();
+                recognitionInstance.lang = 'hi-IN';
+                recognitionInstance.interimResults = true;
+                recognitionInstance.maxAlternatives = 1;
+
+                recognitionInstance.onresult = function(event) {
+                    let speechText = event.results[0][0].transcript.toLowerCase();
+                    document.getElementById('speechStatusText').innerText = "Suna gaya: " + speechText;
+                    
+                    if (event.results[0].isFinal) {
+                        setTimeout(() => {
+                            document.getElementById('voiceModal').style.display = 'none';
+                            processMGRCommand(speechText);
+                        }, 600);
+                    }
+                };
+
+                recognitionInstance.onerror = function(event) {
+                    console.log("Speech warning/error:", event.error);
+                    if(event.error === 'no-speech' || event.error === 'aborted') {
+                        document.getElementById('speechStatusText').innerText = "Awaz nahi aayi, fir se boliye...";
+                        return;
+                    }
+                    document.getElementById('speechStatusText').innerText = "Mic error: " + event.error;
+                    setTimeout(() => {
+                        document.getElementById('voiceModal').style.display = 'none';
+                    }, 1500);
+                };
+
+                recognitionInstance.onend = function() {
+                    recognitionInstance = null;
+                };
+
+                recognitionInstance.start();
+            } catch(e) {
+                console.error(e);
+                document.getElementById('voiceModal').style.display = 'none';
+                alert("Microphone shuru karne mein samasya aayi. Check karein ki site HTTPS par chal rahi hai ya nahi.");
+            }
+        }
+
+        function stopVoiceAssistant() {
+            if(recognitionInstance) recognitionInstance.stop();
+            document.getElementById('voiceModal').style.display = 'none';
+        }
+
+        function processMGRCommand(text) {
+            let cleanText = text.toLowerCase().replace(/hey mgr|mgr|hi mgr|hai/g, "").trim();
+            
+            // 1. Agar naya account ya customer banane ki baat ho
+            if (cleanText.includes('naya') || cleanText.includes('new') || cleanText.includes('account') || cleanText.includes('khata')) {
+                let name = cleanText.replace(/naya|new|account|khata|banao|bana|karo|ka|ki/g, "").trim();
+                name = name.charAt(0).toUpperCase() + name.slice(1);
+                window.location.href = `udhar.html?new_account=${encodeURIComponent(name)}`;
+                return;
+            }
+
+            // 2. Agar Jama / Payment lene ki baat ho
+            if (cleanText.includes('jama') || cleanText.includes('mil gaya') || cleanText.includes('aaye') || cleanText.includes('payment')) {
+                let amountMatch = cleanText.match(/\d+/);
+                let amount = amountMatch ? amountMatch[0] : "0";
+                let name = cleanText.replace(/jama|mil gaya|aaye|payment|rupay|rupees|rs|karo|ka|ki|ke/g, "").replace(amount, "").trim();
+                name = name.charAt(0).toUpperCase() + name.slice(1);
+                window.location.href = `udhar.html?jama_name=${encodeURIComponent(name)}&amount=${amount}`;
+                return;
+            }
+
+            // 3. Agar Udhar add karne ki baat ho
+            if (cleanText.includes('add') || cleanText.includes('likho') || cleanText.includes('udhar') || cleanText.includes('udhari')) {
+                let amountMatch = cleanText.match(/\d+/);
+                let amount = amountMatch ? amountMatch[0] : "0";
+                let name = cleanText.replace(/ki|ka|ke|rupay|rupees|rs|udhari|udhar|add|karo|likho/g, "").replace(amount, "").trim();
+                if(!name) name = "Customer";
+                name = name.charAt(0).toUpperCase() + name.slice(1);
+                window.location.href = `udhar.html?add_name=${encodeURIComponent(name)}&amount=${amount}`;
+                return;
+            }
+
+            // 4. Agar Trader se judi baat ho
+            if (cleanText.includes('trader') || cleanText.includes('maal') || cleanText.includes('party')) {
+                window.location.href = `traders.html?search=${encodeURIComponent(cleanText)}`;
+                return;
+            }
+
+            // Default: Agar sirf naam ya search ho
+            window.location.href = `udhar.html?search=${encodeURIComponent(cleanText)}`;
+        }
+
+ function loadTraders() {
+            let container = document.getElementById('tradersGridContainer');
+            container.innerHTML = '';
+
+            let traders = JSON.parse(localStorage.getItem('chicken_traders') || '[]');
+
+            if(traders.length === 0) {
+                container.innerHTML = `<p style="color: #666; font-size: 11px; grid-column: span 2;">No trader accounts found. Click 'Add New Account' to create one.</p>`;
+                return;
+            }
+
+            traders.forEach(trd => {
+                let balance = calculateTraderBalance(trd.id);
+                let defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23128161'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+                
+                let card = document.createElement('div');
+                card.className = 'customer-card';
+                card.onclick = function(e) {
+                    if(e.target.closest('.delete-icon')) return;
+                    openTraderDetail(trd.id);
+                };
+
+                card.innerHTML = `
+                    <div class="card-top-row">
+                        <img src="${trd.pic || defaultAvatar}" class="customer-avatar" onerror="this.src='${defaultAvatar}'" alt="Avatar">
+                        <div class="card-info">
+                            <h4 class="customer-name">${trd.name}</h4>
+                            <div class="customer-phone">📱 ${trd.phone || 'No Number'}</div>
+                        </div>
+                    </div>
+                    <div class="card-footer-row">
+                        <div class="customer-balance ${balance < 0 ? 'negative' : ''}">₹${balance.toFixed(2)}</div>
+                        <button class="delete-icon" onclick="deleteTrader('${trd.id}')" title="Delete Account">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function calculateTraderBalance(trdId) {
+            let entries = JSON.parse(localStorage.getItem('chicken_trader_entries_' + trdId) || '[]');
+            if(entries.length === 0) return 0;
+            return parseFloat(entries[entries.length - 1].remaining) || 0;
+        }
+
+        function openAddAccountModal() {
+            document.getElementById('newTraderName').value = '';
+            document.getElementById('newTraderPhone').value = '';
+            document.getElementById('newTraderPicFile').value = '';
+            document.getElementById('addAccountModal').style.display = 'flex';
+        }
+        function closeAddAccountModal() {
+            document.getElementById('addAccountModal').style.display = 'none';
+        }
+
+        function saveNewTrader() {
+            let name = document.getElementById('newTraderName').value.trim();
+            let phone = document.getElementById('newTraderPhone').value.trim();
+            let fileInput = document.getElementById('newTraderPicFile');
+
+            if(!name) {
+                alert('Please enter trader name');
+                return;
+            }
+
+            let traders = JSON.parse(localStorage.getItem('chicken_traders') || '[]');
+            let trdId = 'trd_' + Date.now();
+
+            if(fileInput.files && fileInput.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let base64Image = e.target.result;
+                    storeTraderData(trdId, name, phone, base64Image, traders);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                storeTraderData(trdId, name, phone, '', traders);
+            }
+        }
+
+        function storeTraderData(id, name, phone, pic, traders) {
+            let newTrd = {
+                id: id,
+                name: name,
+                phone: phone,
+                pic: pic
+            };
+
+            traders.push(newTrd);
+            localStorage.setItem('chicken_traders', JSON.stringify(traders));
+
+            closeAddAccountModal();
+            loadTraders();
+        }
+
+        function updateTraderPhoto(input) {
+            if (input.files && input.files[0] && currentTraderId) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let base64Image = e.target.result;
+                    let traders = JSON.parse(localStorage.getItem('chicken_traders') || '[]');
+                    let trd = traders.find(t => t.id === currentTraderId);
+                    
+                    if(trd) {
+                        trd.pic = base64Image;
+                        localStorage.setItem('chicken_traders', JSON.stringify(traders));
+                        document.getElementById('detailTraderImg').src = base64Image;
+                        loadTraders();
+                        alert('Trader photo updated successfully!');
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function deleteTrader(trdId) {
+            if(confirm('Are you sure you want to delete this trader and all their records?')) {
+                let traders = JSON.parse(localStorage.getItem('chicken_traders') || '[]');
+                traders = traders.filter(t => t.id !== trdId);
+                localStorage.setItem('chicken_traders', JSON.stringify(traders));
+                localStorage.removeItem('chicken_trader_entries_' + trdId);
+                loadTraders();
+            }
+        }
+
+        function filterTraders() {
+            let query = document.getElementById('searchTraderInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('customer-card');
+            
+            for(let card of cards) {
+                let name = card.querySelector('.customer-name').innerText.toLowerCase();
+                let phone = card.querySelector('.customer-phone').innerText.toLowerCase();
+                if(name.includes(query) || phone.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            }
+        }
+
+        function openTraderDetail(trdId) {
+            currentTraderId = trdId;
+            let traders = JSON.parse(localStorage.getItem('chicken_traders') || '[]');
+            let trd = traders.find(t => t.id === trdId);
+            if(!trd) return;
+
+            let defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23128161'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+
+            document.getElementById('detailTraderName').innerText = trd.name;
+            document.getElementById('detailTraderPhone').innerText = `📱 ${trd.phone || 'No Number'}`;
+            document.getElementById('detailTraderImg').src = trd.pic || defaultAvatar;
+
+            loadTraderHistory(trdId);
+
+            document.getElementById('listView').style.display = 'none';
+            document.getElementById('detailView').style.display = 'block';
+        }
+
+        function backToList() {
+            currentTraderId = null;
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('listView').style.display = 'block';
+            loadTraders();
+        }
+
+        function loadTraderHistory(trdId) {
+            let tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            let entries = JSON.parse(localStorage.getItem('chicken_trader_entries_' + trdId) || '[]');
+
+            if(entries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#777;">No transactions recorded yet.</td></tr>`;
+                return;
+            }
+
+            entries.forEach((entry, index) => {
+                let tr = document.createElement('tr');
+                let amt = parseFloat(entry.amount) || 0;
+                let prevBaki = parseFloat(entry.prevBaki) || 0;
+                let jama = parseFloat(entry.jama) || 0;
+                let remaining = parseFloat(entry.remaining) || 0;
+
+                tr.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.bird || 0}</td>
+                    <td>${entry.weight || 0} Kg</td>
+                    <td>₹${entry.rate || 0}</td>
+                    <td style="color:#333; font-weight:bold;">₹${amt.toFixed(2)}</td>
+                    <td style="color:#d9534f; font-weight:bold;">₹${prevBaki.toFixed(2)}</td>
+                    <td style="color:#128161; font-weight:bold;">₹${jama.toFixed(2)}</td>
+                    <td style="font-weight:bold; color:${remaining < 0 ? '#128161' : '#d9534f'};">₹${remaining.toFixed(2)}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="editEntry(${index})" title="Edit Entry">✏️</button>
+                            <button class="action-btn" onclick="deleteEntry(${index})" title="Delete Entry">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openAddEntryModal() {
+            document.getElementById('entryModalTitle').innerText = "Add Trader Transaction Entry";
+            document.getElementById('editEntryIndex').value = "-1";
+            
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('entryDate').value = today;
+            document.getElementById('entryBird').value = '';
+            document.getElementById('entryWeight').value = '';
+            document.getElementById('entryRate').value = '';
+            document.getElementById('entryAmount').value = '';
+            
+            let lastBalance = calculateTraderBalance(currentTraderId);
+            document.getElementById('entryPrevBaki').value = lastBalance.toFixed(2);
+            document.getElementById('entryJama').value = '';
+            
+            calculateRemaining();
+            document.getElementById('addEntryModal').style.display = 'flex';
+        }
+
+        function editEntry(index) {
+            let entries = JSON.parse(localStorage.getItem('chicken_trader_entries_' + currentTraderId) || '[]');
+            let entry = entries[index];
+            if(!entry) return;
+
+            document.getElementById('entryModalTitle').innerText = "Edit Trader Transaction Entry";
+            document.getElementById('editEntryIndex').value = index;
+
+            document.getElementById('entryDate').value = entry.date || '';
+            document.getElementById('entryBird').value = entry.bird || '';
+            document.getElementById('entryWeight').value = entry.weight || '';
+            document.getElementById('entryRate').value = entry.rate || '';
+            document.getElementById('entryAmount').value = entry.amount || '';
+            document.getElementById('entryPrevBaki').value = entry.prevBaki || '';
+            document.getElementById('entryJama').value = entry.jama || '';
+            document.getElementById('entryRemaining').value = entry.remaining || '';
+
+            document.getElementById('addEntryModal').style.display = 'flex';
+        }
+
+        function deleteEntry(index) {
+            if(confirm('Are you sure you want to delete this transaction entry?')) {
+                let entries = JSON.parse(localStorage.getItem('chicken_trader_entries_' + currentTraderId) || '[]');
+                entries.splice(index, 1);
+                
+                let runningBaki = 0;
+                entries.forEach((ent, i) => {
+                    if(i === 0) {
+                        ent.prevBaki = 0;
+                    } else {
+                        ent.prevBaki = entries[i - 1].remaining;
+                    }
+                    ent.remaining = (parseFloat(ent.prevBaki) + parseFloat(ent.amount)) - parseFloat(ent.jama);
+                });
+
+                localStorage.setItem('chicken_trader_entries_' + currentTraderId, JSON.stringify(entries));
+                loadTraderHistory(currentTraderId);
+            }
+        }
+
+        function closeAddEntryModal() {
+            document.getElementById('addEntryModal').style.display = 'none';
+        }
+
+        function calculateAmount() {
+            let weight = parseFloat(document.getElementById('entryWeight').value) || 0;
+            let rate = parseFloat(document.getElementById('entryRate').value) || 0;
+            if(weight > 0 && rate > 0) {
+                document.getElementById('entryAmount').value = (weight * rate).toFixed(2);
+            }
+            calculateRemaining();
+        }
+
+        function calculateRemaining() {
+            let amount = parseFloat(document.getElementById('entryAmount').value) || 0;
+            let prevBaki = parseFloat(document.getElementById('entryPrevBaki').value) || 0;
+            let jama = parseFloat(document.getElementById('entryJama').value) || 0;
+
+            let totalRemaining = (prevBaki + amount) - jama;
+            document.getElementById('entryRemaining').value = totalRemaining.toFixed(2);
+        }
+
+        function saveNewEntry() {
+            let date = document.getElementById('entryDate').value;
+            let bird = document.getElementById('entryBird').value;
+            let weight = document.getElementById('entryWeight').value;
+            let rate = document.getElementById('entryRate').value;
+            let amount = document.getElementById('entryAmount').value;
+            let prevBaki = document.getElementById('entryPrevBaki').value;
+            let jama = document.getElementById('entryJama').value;
+            let remaining = document.getElementById('entryRemaining').value;
+            let editIndex = parseInt(document.getElementById('editEntryIndex').value);
+
+            if(!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            let entries = JSON.parse(localStorage.getItem('chicken_trader_entries_' + currentTraderId) || '[]');
+            
+            let entryData = {
+                date: date,
+                bird: bird,
+                weight: weight,
+                rate: rate,
+                amount: parseFloat(amount) || 0,
+                prevBaki: parseFloat(prevBaki) || 0,
+                jama: parseFloat(jama) || 0,
+                remaining: parseFloat(remaining) || 0
+            };
+
+            if(editIndex >= 0) {
+                entries[editIndex] = entryData;
+            } else {
+                entries.push(entryData);
+            }
+
+            localStorage.setItem('chicken_trader_entries_' + currentTraderId, JSON.stringify(entries));
+            closeAddEntryModal();
+            loadTraderHistory(currentTraderId);
+
+            let traders = JSON.parse(localStorage.getItem('chicken_traders') || '[]');
+            let trd = traders.find(t => t.id === currentTraderId);
+            let traderName = trd ? trd.name : "Unknown";
+
+            let sheetUrl = localStorage.getItem('chicken_deploy');
+            if (sheetUrl && sheetUrl.startsWith('http')) {
+                let sheetData = {
+                    sheetName: "Traders",
+                    row: [date, traderName, bird, weight, rate, parseFloat(amount) || 0, parseFloat(prevBaki) || 0, parseFloat(jama) || 0, parseFloat(remaining) || 0]
+                };
+
+                fetch(sheetUrl, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(sheetData)
+                })
+                .then(() => {
+                    console.log("Trader data successfully synced with Google Sheet!");
+                })
+                .catch(error => console.error("Error sending to sheet:", error));
+            }
+        }
+
+        function changeLanguage() {
+            let lang = document.getElementById('langSelect').value;
+            localStorage.setItem('chicken_lang', lang);
+            applyLanguage(lang);
+        }
+
+        function applyLanguage(lang) {
+            const texts = {
+                en: { traders: "Traders / Suppliers", addAcc: "Add New Account", search: "Search Trader...", navDash: "Dashboard", navUdhar: "Udhar", navTradersNav: "Traders", navCollection: "Collection" },
+                mr: { traders: "व्यापारी (Traders)", addAcc: "नवीन खाते जोडा", search: "व्यापारी शोधा...", navDash: "डैशबोर्ड", navUdhar: "उधार", navTradersNav: "व्यापारी", navCollection: "कलेक्शन" },
+                ar: { traders: "الموردين", addAcc: "إضافة حساب جديد", search: "بحث عن مورد...", navDash: "لوحة التحكم", navUdhar: "الديون", navTradersNav: "الموردين", navCollection: "التحصيل" }
+            };
+            let t = texts[lang] || texts.en;
+            document.getElementById('txtTradersTitle').innerText = t.traders;
+            document.getElementById('txtAddAccount').innerText = t.addAcc;
+            document.getElementById('searchTraderInput').placeholder = t.search;
+            document.getElementById('txtDash').innerText = t.navDash;
+            document.getElementById('txtUdhar').innerText = t.navUdhar;
+            document.getElementById('txtTradersNav').innerText = t.navTradersNav;
+            document.getElementById('txtCollection').innerText = t.navCollection;
+
+            if(lang === 'ar') {
+                document.dir = 'rtl';
+            } else {
+                document.dir = 'ltr';
+            }
+        }
+    </script>
+</body>
+</html>
