@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>Chicken Shop MGR - Traders Management</title>
 
-     <!-- PWA Manifest Link -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#128161">
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#128161">
+
+    <!-- Firebase App & Realtime Database SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -15,7 +19,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background: #f4fbf8; 
             margin: 0; 
-            padding-bottom: 110px; /* Isko 90px se badha kar 110px kar dein */
+            padding-bottom: 110px; 
             opacity: 0; 
             animation: fadeInPage 0.2s ease-in-out forwards; 
             min-height: 100vh; 
@@ -118,8 +122,8 @@
 
         .modal-buttons { display: flex; justify-content: flex-end; gap: 8px; }
 
-        /* Modern Bottom Navigation Bar with Vector Icons */
-       .bottom-nav { 
+        /* Modern Bottom Navigation Bar with Vector Infos */
+        .bottom-nav { 
             position: fixed; 
             bottom: 0; 
             left: 0; 
@@ -131,7 +135,7 @@
             align-items: center;
             box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08); 
             border-top: 2px solid #d4ece3; 
-            z-index: 99999; /* Isko high rakhein taki browser bar ke upar rahe */
+            z-index: 99999; 
         }
 
         .nav-item { 
@@ -182,34 +186,34 @@
             cursor: pointer;
             flex: 1;
         }
-.voice-round-btn { 
-    width: 58px; 
-    height: 58px; 
-    border-radius: 50%; 
-    background: #128161; 
-    border: 3px solid #ffffff; 
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(18, 129, 97, 0.45); 
-    cursor: pointer; 
-    display: flex;
-    align-items: center;
-    justify-name: center;
-}
-.voice-round-btn img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.voice-glow-ring { 
-    position: absolute; 
-    width: 68px; 
-    height: 68px; 
-    border-radius: 50%; 
-    background: rgba(18, 129, 97, 0.25); 
-    animation: pulse-glow 2s infinite; 
-    z-index: -1; 
-}
+        .voice-round-btn { 
+            width: 58px; 
+            height: 58px; 
+            border-radius: 50%; 
+            background: #128161; 
+            border: 3px solid #ffffff; 
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(18, 129, 97, 0.45); 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .voice-round-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .voice-glow-ring { 
+            position: absolute; 
+            width: 68px; 
+            height: 68px; 
+            border-radius: 50%; 
+            background: rgba(18, 129, 97, 0.25); 
+            animation: pulse-glow 2s infinite; 
+            z-index: -1; 
+        }
 
         @keyframes pulse-glow {
             0% { transform: scale(1); opacity: 0.8; }
@@ -283,12 +287,12 @@
     </header>
 
     <div class="container">
-<!-- Back to Dashboard Button -->
-    <div style="margin-bottom: 10px;">
-        <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 4px; background: #fff; color: #128161; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #128161;">
-            ⬅️ Back to Dashboard
-        </a>
-    </div>
+        <!-- Back to Dashboard Button -->
+        <div style="margin-bottom: 10px;">
+            <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 4px; background: #fff; color: #128161; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #128161;">
+                ⬅️ Back to Dashboard
+            </a>
+        </div>
         
         <!-- VIEW 1: TRADERS LIST -->
         <div id="listView">
@@ -423,12 +427,12 @@
         </a>
 
         <!-- Center Elevated MGR Button -->
-       <a href="about.html" class="voice-center-container" title="About App">
-    <div class="voice-glow-ring"></div>
-    <button class="voice-round-btn">
-        <img src="logo.png" alt="App Info">
-    </button>
-</a>
+        <div class="voice-center-container" onclick="startVoiceAssistant()" title="Hey MGR Voice Assistant">
+            <div class="voice-glow-ring"></div>
+            <button class="voice-round-btn">
+                <img src="logo.png" alt="MGR">
+            </button>
+        </div>
 
         <a href="traders.html" class="nav-item active" id="navTraders">
             <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
@@ -441,6 +445,19 @@
     </nav>
 
     <script>
+        // --- Firebase Initialization & Config ---
+        const firebaseConfig = {
+            databaseURL: "https://fresh2cut-default-rtdb.firebaseio.com/"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        function getShopPath() {
+        let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
+        return 'licenses/' + shopCode;
+      }
         let currentTraderId = null;
         let recognitionInstance = null;
 
@@ -453,7 +470,7 @@
             if(owner) document.getElementById('headerOwner').innerText = 'Owner: ' + owner;
             if(pic) document.getElementById('headerImg').src = pic;
 
-            loadTraders();
+            initFirebaseSync();
 
             let savedLang = localStorage.getItem('chicken_lang') || 'en';
             document.getElementById('langSelect').value = savedLang;
@@ -465,66 +482,33 @@
             }
         }
 
-        /* MGR Voice Assistant Engine */
-/* MGR Voice Assistant Engine */
-        function startVoiceAssistant() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Aapka browser voice recognition support nahi karta. Kripya Google Chrome use karein.");
-                return;
-            }
+        // --- Firebase Realtime Sync ---
+        function initFirebaseSync() {
+            // Sync Traders List
+            db.ref(getShopPath() + '/traders').on('value', (snapshot) => {
+                let data = snapshot.val();
+                let traders = data ? Object.values(data) : [];
+                localStorage.setItem('chicken_traders', JSON.stringify(traders));
+                loadTraders();
+                if(currentTraderId) {
+                    loadTraderHistory(currentTraderId);
+                }
+            });
 
-            if (recognitionInstance) {
-                try { recognitionInstance.stop(); } catch(e) {}
-                recognitionInstance = null;
-            }
-
-            document.getElementById('voiceModal').style.display = 'flex';
-            document.getElementById('speechStatusText').innerText = "Hey MGR sun raha hai, boliye...";
-
-            try {
-                recognitionInstance = new SpeechRecognition();
-                recognitionInstance.lang = 'hi-IN';
-                recognitionInstance.interimResults = true;
-                recognitionInstance.maxAlternatives = 1;
-
-                recognitionInstance.onresult = function(event) {
-                    let speechText = event.results[0][0].transcript.toLowerCase();
-                    document.getElementById('speechStatusText').innerText = "Suna gaya: " + speechText;
-                    
-                    if (event.results[0].isFinal) {
-                        setTimeout(() => {
-                            document.getElementById('voiceModal').style.display = 'none';
-                            processMGRCommand(speechText);
-                        }, 600);
-                    }
-                };
-
-                recognitionInstance.onerror = function(event) {
-                    console.log("Speech warning/error:", event.error);
-                    if(event.error === 'no-speech' || event.error === 'aborted') {
-                        document.getElementById('speechStatusText').innerText = "Awaz nahi aayi, fir se boliye...";
-                        return;
-                    }
-                    document.getElementById('speechStatusText').innerText = "Mic error: " + event.error;
-                    setTimeout(() => {
-                        document.getElementById('voiceModal').style.display = 'none';
-                    }, 1500);
-                };
-
-                recognitionInstance.onend = function() {
-                    recognitionInstance = null;
-                };
-
-                recognitionInstance.start();
-            } catch(e) {
-                console.error(e);
-                document.getElementById('voiceModal').style.display = 'none';
-                alert("Microphone shuru karne mein samasya aayi. Check karein ki site HTTPS par chal rahi hai ya nahi.");
-            }
+            // Sync Trader Entries
+            db.ref(getShopPath() + '/traders_entries').on('value', (snapshot) => {
+                let data = snapshot.val() || {};
+                for(let trdId in data) {
+                    localStorage.setItem('chicken_trader_entries_' + trdId, JSON.stringify(Object.values(data[trdId])));
+                }
+                loadTraders();
+                if(currentTraderId) {
+                    loadTraderHistory(currentTraderId);
+                }
+            });
         }
 
-       /* MGR Voice Assistant Engine */
+        /* MGR Voice Assistant Engine */
         function startVoiceAssistant() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -590,7 +574,6 @@
         function processMGRCommand(text) {
             let cleanText = text.toLowerCase().replace(/hey mgr|mgr|hi mgr|hai/g, "").trim();
             
-            // 1. Agar naya account ya customer banane ki baat ho
             if (cleanText.includes('naya') || cleanText.includes('new') || cleanText.includes('account') || cleanText.includes('khata')) {
                 let name = cleanText.replace(/naya|new|account|khata|banao|bana|karo|ka|ki/g, "").trim();
                 name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -598,7 +581,6 @@
                 return;
             }
 
-            // 2. Agar Jama / Payment lene ki baat ho
             if (cleanText.includes('jama') || cleanText.includes('mil gaya') || cleanText.includes('aaye') || cleanText.includes('payment')) {
                 let amountMatch = cleanText.match(/\d+/);
                 let amount = amountMatch ? amountMatch[0] : "0";
@@ -608,7 +590,6 @@
                 return;
             }
 
-            // 3. Agar Udhar add karne ki baat ho
             if (cleanText.includes('add') || cleanText.includes('likho') || cleanText.includes('udhar') || cleanText.includes('udhari')) {
                 let amountMatch = cleanText.match(/\d+/);
                 let amount = amountMatch ? amountMatch[0] : "0";
@@ -619,17 +600,15 @@
                 return;
             }
 
-            // 4. Agar Trader se judi baat ho
             if (cleanText.includes('trader') || cleanText.includes('maal') || cleanText.includes('party')) {
                 window.location.href = `traders.html?search=${encodeURIComponent(cleanText)}`;
                 return;
             }
 
-            // Default: Agar sirf naam ya search ho
             window.location.href = `udhar.html?search=${encodeURIComponent(cleanText)}`;
         }
 
- function loadTraders() {
+        function loadTraders() {
             let container = document.getElementById('tradersGridContainer');
             container.innerHTML = '';
 
@@ -720,6 +699,11 @@
             traders.push(newTrd);
             localStorage.setItem('chicken_traders', JSON.stringify(traders));
 
+            // Sync to Firebase
+            let tradersObj = {};
+            traders.forEach(t => tradersObj[t.id] = t);
+            db.ref(getShopPath() + '/traders').set(tradersObj);
+
             closeAddAccountModal();
             loadTraders();
         }
@@ -735,6 +719,11 @@
                     if(trd) {
                         trd.pic = base64Image;
                         localStorage.setItem('chicken_traders', JSON.stringify(traders));
+                        
+                        let tradersObj = {};
+                        traders.forEach(t => tradersObj[t.id] = t);
+                        db.ref(getShopPath() + '/traders').set(tradersObj);
+
                         document.getElementById('detailTraderImg').src = base64Image;
                         loadTraders();
                         alert('Trader photo updated successfully!');
@@ -750,6 +739,12 @@
                 traders = traders.filter(t => t.id !== trdId);
                 localStorage.setItem('chicken_traders', JSON.stringify(traders));
                 localStorage.removeItem('chicken_trader_entries_' + trdId);
+
+                let tradersObj = {};
+                traders.forEach(t => tradersObj[t.id] = t);
+                db.ref(getShopPath() + '/traders').set(tradersObj);
+                db.ref(getShopPath() + '/traders_entries/' + trdId).remove();
+
                 loadTraders();
             }
         }
@@ -887,6 +882,11 @@
                 });
 
                 localStorage.setItem('chicken_trader_entries_' + currentTraderId, JSON.stringify(entries));
+                
+                let entriesObj = {};
+                entries.forEach((e, idx) => entriesObj[idx] = e);
+                db.ref(getShopPath() + '/traders_entries/' + currentTraderId).set(entriesObj);
+
                 loadTraderHistory(currentTraderId);
             }
         }
@@ -949,6 +949,12 @@
             }
 
             localStorage.setItem('chicken_trader_entries_' + currentTraderId, JSON.stringify(entries));
+
+            // Sync entries to Firebase
+            let entriesObj = {};
+            entries.forEach((e, idx) => entriesObj[idx] = e);
+            db.ref(getShopPath() + '/traders_entries/' + currentTraderId).set(entriesObj);
+
             closeAddEntryModal();
             loadTraderHistory(currentTraderId);
 
@@ -987,7 +993,7 @@
         function applyLanguage(lang) {
             const texts = {
                 en: { traders: "Traders / Suppliers", addAcc: "Add New Account", search: "Search Trader...", navDash: "Dashboard", navUdhar: "Udhar", navTradersNav: "Traders", navCollection: "Collection" },
-                mr: { traders: "व्यापारी (Traders)", addAcc: "नवीन खाते जोडा", search: "व्यापारी शोधा...", navDash: "डैशबोर्ड", navUdhar: "उधार", navTradersNav: "व्यापारी", navCollection: "कलेक्शन" },
+                mr: { traders: "व्यापारी (Traders)", addAcc: "नवीन खाते जोडा", search: "व्यापari शोधा...", navDash: "डैशबोर्ड", navUdhar: "उधार", navTradersNav: "व्यापारी", navCollection: "कलेक्शन" },
                 ar: { traders: "الموردين", addAcc: "إضافة حساب جديد", search: "بحث عن مورد...", navDash: "لوحة التحكم", navUdhar: "الديون", navTradersNav: "الموردين", navCollection: "التحصيل" }
             };
             let t = texts[lang] || texts.en;

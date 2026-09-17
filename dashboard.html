@@ -9,6 +9,10 @@
     <meta name="theme-color" content="#128161">
     <link rel="apple-touch-icon" href="logo.png">
 
+    <!-- Firebase App (Modular) & Realtime Database CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -136,7 +140,6 @@
             margin-bottom: 6px;
         }
 
-        /* डैशबोर्ड पर बैकअप बटन के लिए स्टाइल */
         .btn-backup-dash {
             display: block;
             width: 100%;
@@ -262,7 +265,6 @@
 
             <a href="collection.html" class="btn-main-action" id="btnGetStarted">Get Started with Digital Management</a>
             
-            <!-- डैशबोर्ड पर डायरेक्ट बैकअप डाउनलोड बटन -->
             <button onclick="exportAppData()" class="btn-backup-dash">📥 Save JSON Backup to Phone</button>
         </div>
 
@@ -322,6 +324,60 @@
     </nav>
 
     <script>
+        // ==========================================
+        // FIREBASE CLOUD CONFIGURATION & SYNC SETUP
+        // ==========================================
+        const firebaseConfig = {
+            databaseURL: "https://chickenmgr-default-rtdb.firebaseio.com/" // अपनी Firebase Realtime Database URL यहाँ डालें
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        // दुकान का यूनिक कोड या आईडी प्राप्त करना (लोकल स्टोरेज से)
+        function getActiveShopCode() {
+            let code = localStorage.getItem('chicken_shop_code') || localStorage.getItem('shop_code') || 'kcc_default_shop';
+            return code.trim().replace(/[\.#$\[\]]/g, "_"); // सेफ पाथ के लिए स्पेशल कैरेक्टर हटाना
+        }
+
+        // क्लाउड से डेटा सिंक करने का फंक्शन (Realtime Sync)
+        function syncDataWithCloud() {
+            const shopCode = getActiveShopCode();
+            const shopRef = db.ref('shops/' + shopCode);
+
+            // 1. लोकल डेटा को क्लाउड पर भेजना (Push)
+            const appData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                try {
+                    appData[key] = JSON.parse(localStorage.getItem(key));
+                } catch (e) {
+                    appData[key] = localStorage.getItem(key);
+                }
+            }
+            shopRef.set(appData).catch(err => console.log("Cloud sync push error:", err));
+
+            // 2. क्लाउड से लेटेस्ट डेटा सुनना और लोकल स्टोरेज में अपडेट करना (Pull / Realtime Listener)
+            shopRef.on('value', (snapshot) => {
+                const cloudData = snapshot.val();
+                if (cloudData) {
+                    for (const key in cloudData) {
+                        if (cloudData.hasOwnProperty(key)) {
+                            let val = cloudData[key];
+                            if (typeof val === 'object') {
+                                localStorage.setItem(key, JSON.stringify(val));
+                            } else {
+                                localStorage.setItem(key, val);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         const translations = {
             en: {
                 welcomeTitle: "Welcome to chickenMGR Digital Management!",
@@ -382,6 +438,9 @@
 
             checkSmartPanchang();
             initVideoPlayer();
+
+            // Firebase क्लाउड सिंक चालू करें
+            syncDataWithCloud();
         }
 
         function initVideoPlayer() {
@@ -461,7 +520,6 @@
             document.getElementById('panchangCardBox').className = cardBoxClass;
         }
 
-        // डैशबोर्ड से JSON बैकअप डाउनलोड करने का फंक्शन
         function exportAppData() {
             try {
                 const appData = {};
@@ -499,7 +557,6 @@
             document.getElementById('welcomeSub').innerText = t.welcomeSub;
             document.getElementById('btnGetStarted').innerText = t.btnGetStarted;
             document.getElementById('prodLeg').innerText = t.prodLeg;
-            document.getElementById('prodBoneless').innerText.value = t.prodBoneless;
             document.getElementById('prodBoneless').innerText = t.prodBoneless;
             document.getElementById('prodLiver').innerText = t.prodLiver;
             document.getElementById('txtDash').innerText = t.navDash;

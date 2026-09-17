@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chicken Shop MGR - Setup</title>
+    <title>Chicken Shop MGR - Setup & Login</title>
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#128161">
+
+    <!-- Firebase App & Realtime Database SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         * { box-sizing: border-box; }
@@ -19,7 +23,7 @@
 
         .setup-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; border-top: 6px solid #128161; border: 1px solid #d4ece3; }
         
-        /* Facebook Style Profile Picture */
+        /* Profile Picture Style */
         .profile-container { position: relative; width: 85px; height: 85px; margin: 0 auto 12px auto; cursor: pointer; }
         .profile-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #128161; background: #e0e0e0; }
         .camera-badge { position: absolute; bottom: 0; right: 0; background: #128161; color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; justify-content: center; align-items: center; font-size: 13px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -47,35 +51,49 @@
         <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
 
         <h2>Chicken Shop MGR</h2>
-        <p class="sub">Setup Your Shop Details</p>
+        <p class="sub">Verify License & Login</p>
         
         <label>Shop Name:</label>
-        <input type="text" id="shopName" placeholder="Enter Shop Name" autocomplete="off" name="no-shop">
+        <input type="text" id="shopName" placeholder="Auto-filled after verification" autocomplete="off" readonly style="background: #f1f8f5;">
         
         <label>Owner Name:</label>
-        <input type="text" id="ownerName" placeholder="Enter Owner Name" autocomplete="off" name="no-owner">
+        <input type="text" id="ownerName" placeholder="Auto-filled after verification" autocomplete="off" readonly style="background: #f1f8f5;">
         
-        <label>Activation Code (Optional):</label>
-        <input type="text" id="deployLink" placeholder="Activation Coad (Optional)" autocomplete="off" name="no-link">
+        <label>Activation Code / Shop Code:</label>
+        <input type="text" id="deployLink" placeholder="Enter your Activation Code (e.g. CMGR-000-0001)" autocomplete="off">
         
-        <button onclick="verifyAndActivateCode()">🔑 Verify & Activate Code</button>
+        <button onclick="verifyAndActivateCode()">🔐 Verify & Login</button>
         <button class="btn-outline" onclick="contactAdmin()">💬 Need Activation Code? Contact Admin</button>
-        
-        <button onclick="saveSetupData()">Save & Continue</button>
     </div>
 
     <script>
+        // ==========================================
+        // FIREBASE CONFIGURATION (chickenshopmgr)
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmow7L09h3VHzyvMgiLgnrVGwxcCetMDM",
+            authDomain: "chickenshopmgr.firebaseapp.com",
+            projectId: "chickenshopmgr",
+            storageBucket: "chickenshopmgr.firebasestorage.app",
+            messagingSenderId: "306438288000",
+            appId: "1:306438288000:web:34901b68a74ba1e8812c65",
+            measurementId: "G-286R4G85JM",
+            databaseURL: "https://chickenshopmgr-default-rtdb.firebaseio.com/"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
 
         let base64Image = "";
 
         window.onload = function() {
-            // Check karein ki kya pehle se setup ho rakha hai ya nahi
+            // Check karein ki kya pehle se login/setup ho rakha hai ya nahi
             let savedShop = localStorage.getItem('chicken_shop');
-            let savedCode = localStorage.getItem('chicken_code');
-            let savedDeploy = localStorage.getItem('chicken_deploy');
+            let savedShopCode = localStorage.getItem('chicken_shop_code');
 
-            // Agar shop name ya code saved hai, toh seedha dashboard par bhej dein
-            if (savedShop || savedCode || savedDeploy) {
+            if (savedShop && savedShopCode) {
                 window.location.href = 'dashboard.html';
                 return;
             }
@@ -94,87 +112,64 @@
                 reader.onload = function(e) {
                     base64Image = e.target.result;
                     document.getElementById('profilePreview').src = base64Image;
+                    localStorage.setItem('chicken_pic', base64Image);
                 }
                 reader.readAsDataURL(file);
             }
         }
 
+        // --- FIREBASE LICENSE VERIFICATION FUNCTION ---
         function verifyAndActivateCode() {
-            let shopCode = document.getElementById('deployLink').value.trim();
+            let shopCodeInput = document.getElementById('deployLink').value.trim();
             
-            if(!shopCode) {
-                alert('Kripya pehle Shop Code enter karein!');
+            if(!shopCodeInput) {
+                alert('Kripya pehle apna Activation Code enter karein!');
                 return;
             }
 
-            let masterApiUrl = "https://script.google.com/macros/s/AKfycbxYKd0KJLTrqlqAIy2odvrsN4PjoIJIPsYVJ9MaIFUIkGUc3i9-x-XA7FTj_EoGXkvf/exec"; 
+            alert('Verifying code with Firebase Cloud...');
 
-            alert('Verifying code...');
+            // Firebase database mein 'licenses' node ke andar code check karna
+            db.ref('licenses/' + shopCodeInput).once('value')
+                .then(snapshot => {
+                    let licenseData = snapshot.val();
 
-            fetch(`${masterApiUrl}?code=${shopCode}`)
-                .then(response => response.json())
-                .then(data => {
-                    if(data.status === "success") {
-                        localStorage.setItem('chicken_deploy', data.deployLink);
-                        localStorage.setItem('chicken_shop', data.shopName);
-                        localStorage.setItem('chicken_owner', data.ownerName);
-                        localStorage.setItem('chicken_code', shopCode);
+                    if(licenseData) {
+                        // Check karein ki license active hai ya nahi
+                        if(licenseData.status === "Active" || licenseData.status === "active") {
+                            
+                            let sName = licenseData.shopName || licenseData.ShopName || "My Chicken Shop";
+                            let oName = licenseData.ownerName || licenseData.OwnerName || "Shop Owner";
 
-                        alert('Code Successfully Verified & Activated for ' + data.shopName + '!');
-                        window.location.href = 'dashboard.html';
-                    } 
-                    else if(data.status === "blocked") {
-                        alert("ACCESS DENIED: " + data.message);
-                        localStorage.clear();
-                    } 
-                    else {
-                        alert('Verification Failed: ' + data.message);
+                            // Local storage mein secure data save karna
+                            localStorage.setItem('chicken_shop_code', shopCodeInput);
+                            localStorage.setItem('chicken_shop', sName);
+                            localStorage.setItem('chicken_owner', oName);
+                            localStorage.setItem('chicken_code', shopCodeInput);
+
+                            document.getElementById('shopName').value = sName;
+                            document.getElementById('ownerName').value = oName;
+
+                            alert('Access Granted! Welcome to ' + sName);
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            alert("ACCESS DENIED: Aapka license inactive ya expired ho chuka hai. Kripya Admin se sampark karein.");
+                            localStorage.clear();
+                        }
+                    } else {
+                        alert('Verification Failed: Yeh Activation Code database mein nahi mila. Kripya sahi code daalein.');
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('Connection Error! Kripya dobara koshish karein.');
+                    console.error('Firebase Error:', error);
+                    alert('Connection Error! Internet connection check karein.');
                 });
         }
 
         function contactAdmin() {
-            let adminNumber = "919876543210";
-            let message = encodeURIComponent("Hello Admin, mujhe Chicken Shop MGR ke liye Activation Code chahiye.");
+            let adminNumber = "919876543210"; // Apna WhatsApp Number yahan daal sakte hain
+            let message = encodeURIComponent("Hello Admin, mujhe Chicken Shop MGR ke liye naya Activation Code chahiye.");
             window.open(`https://wa.me/${adminNumber}?text=${message}`, '_blank');
-        }
-
-        function saveSetupData() {
-            let shop = document.getElementById('shopName').value.trim();
-            let owner = document.getElementById('ownerName').value.trim();
-            let link = document.getElementById('deployLink').value.trim();
-
-            if(!shop || !owner) {
-                alert('Kripya Shop Name aur Owner Name sahi से bharein!');
-                return;
-            }
-
-            localStorage.setItem('chicken_shop', shop);
-            localStorage.setItem('chicken_owner', owner);
-            localStorage.setItem('chicken_code', link ? link : 'manual_setup');
-            
-            if(base64Image) {
-                localStorage.setItem('chicken_pic', base64Image);
-                
-                try {
-                    let shortcutIconLink = document.querySelector("link[rel*='icon']") || document.createElement('link');
-                    shortcutIconLink.type = 'image/png';
-                    shortcutIconLink.rel = 'shortcut icon';
-                    shortcutIconLink.href = base64Image;
-                    document.getElementsByTagName('head')[0].appendChild(shortcutIconLink);
-                } catch(err) {
-                    console.log("Icon update note: ", err);
-                }
-            }
-            
-            localStorage.setItem('chicken_deploy', link);
-
-            alert('Setup Successfully Saved!');
-            window.location.href = 'dashboard.html';
         }
     </script>
 </body>

@@ -11,11 +11,11 @@
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-       body { 
+        body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background: #f4fbf8; 
             margin: 0; 
-            padding-bottom: 110px; /* Isko 90px se badha kar 110px kar dein */
+            padding-bottom: 110px; 
             opacity: 0; 
             animation: fadeInPage 0.2s ease-in-out forwards; 
             min-height: 100vh; 
@@ -56,7 +56,6 @@
         
         .action-controls { display: flex; align-items: center; gap: 6px; }
         
-        /* Compact Month Selector */
         .month-selector { 
             padding: 5px 8px; 
             border: 1px solid #d4ece3; 
@@ -75,7 +74,7 @@
         .add-account-btn { background: #128161; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
         .add-account-btn:hover { background: #0e664d; }
 
-        /* Summary Cards Grid - Compact Udhar Style (2 columns) */
+        /* Summary Cards Grid */
         .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
         
         .col-card { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 4px solid #128161; position: relative; }
@@ -96,11 +95,10 @@
         .history-table th { background: #f4fbf8; color: #128161; padding: 8px 10px; border-bottom: 2px solid #d4ece3; }
         .history-table td { padding: 8px 10px; border-bottom: 1px solid #eee; color: #444; }
 
-        /* Delete Button */
         .del-btn { background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
         .del-btn:hover { background: #c0392b; }
 
-        /* Modals / Popups */
+        /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal-box { background: white; padding: 15px; border-radius: 10px; width: 90%; max-width: 320px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
         .modal-box h3 { margin-top: 0; font-size: 14px; color: #128161; margin-bottom: 10px; }
@@ -112,20 +110,7 @@
         .btn-green:hover { background: #0e664d; }
         .btn-gray:hover { background: #6c7a89; }
 
-        /* Modern Bottom Navigation Bar with Vector Icons */
-       body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: #f4fbf8; 
-            margin: 0; 
-            padding-bottom: 110px; /* Isko 90px se badha kar 110px kar dein */
-            opacity: 0; 
-            animation: fadeInPage 0.2s ease-in-out forwards; 
-            min-height: 100vh; 
-            display: flex;     
-            flex-direction: column; 
-        }
-
-        /* Modern Floating Footer / Bottom Navigation */
+        /* Modern Bottom Navigation Bar */
         .bottom-nav { 
             position: fixed; 
             bottom: 0; 
@@ -138,7 +123,7 @@
             align-items: center;
             box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08); 
             border-top: 2px solid #d4ece3; 
-            z-index: 99999; /* Isko high rakhein taki browser bar ke upar rahe */
+            z-index: 99999; 
         }
         .nav-item { 
             flex: 1; 
@@ -154,29 +139,11 @@
             transition: all 0.2s ease; 
         }
 
-        .nav-item svg {
-            width: 26px;
-            height: 26px;
-            margin-bottom: 3px;
-            fill: #666666;
-            transition: all 0.2s ease;
-        }
-
-        .nav-item.active { 
-            color: #128161; 
-        }
-
-        .nav-item.active svg {
-            fill: #128161;
-            transform: translateY(-2px);
-        }
-
-        .nav-item:hover {
-            color: #128161;
-        }
-        .nav-item:hover svg {
-            fill: #128161;
-        }
+        .nav-item svg { width: 26px; height: 26px; margin-bottom: 3px; fill: #666666; transition: all 0.2s ease; }
+        .nav-item.active { color: #128161; }
+        .nav-item.active svg { fill: #128161; transform: translateY(-2px); }
+        .nav-item:hover { color: #128161; }
+        .nav-item:hover svg { fill: #128161; }
 
         /* Center Elevated MGR Button */
         .voice-center-container {
@@ -188,34 +155,30 @@
             cursor: pointer;
             flex: 1;
         }
-.voice-round-btn { 
-    width: 58px; 
-    height: 58px; 
-    border-radius: 50%; 
-    background: #128161; 
-    border: 3px solid #ffffff; 
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(18, 129, 97, 0.45); 
-    cursor: pointer; 
-    display: flex;
-    align-items: center;
-    justify-name: center;
-}
-.voice-round-btn img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.voice-glow-ring { 
-    position: absolute; 
-    width: 68px; 
-    height: 68px; 
-    border-radius: 50%; 
-    background: rgba(18, 129, 97, 0.25); 
-    animation: pulse-glow 2s infinite; 
-    z-index: -1; 
-}
+        .voice-round-btn { 
+            width: 58px; 
+            height: 58px; 
+            border-radius: 50%; 
+            background: #128161; 
+            border: 3px solid #ffffff; 
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(18, 129, 97, 0.45); 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .voice-round-btn img { width: 100%; height: 100%; object-fit: cover; }
+        .voice-glow-ring { 
+            position: absolute; 
+            width: 68px; 
+            height: 68px; 
+            border-radius: 50%; 
+            background: rgba(18, 129, 97, 0.25); 
+            animation: pulse-glow 2s infinite; 
+            z-index: -1; 
+        }
 
         @keyframes pulse-glow {
             0% { transform: scale(1); opacity: 0.8; }
@@ -246,17 +209,19 @@
             max-width: 320px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
-        .mic-wave {
-            font-size: 40px;
-            margin-bottom: 10px;
-            animation: bounceMic 1s infinite alternate;
-        }
+        .mic-wave { font-size: 40px; margin-bottom: 10px; animation: bounceMic 1s infinite alternate; }
         @keyframes bounceMic {
             from { transform: translateY(0); }
             to { transform: translateY(-8px); }
         }
     </style>
 </head>
+
+<!-- Firebase App (Core) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<!-- Firebase Realtime Database -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 <body>
 
     <!-- Voice Listening Modal Popup -->
@@ -274,7 +239,7 @@
         <div class="header-left">
             <img id="headerImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Profile">
             <div class="shop-info">
-                <h2 id="headerShop">कदीर चिकन सेंटर (KCC)</h2>
+                <h2 id="headerShop">Chicken Shop MGR</h2>
                 <p id="headerOwner">Owner: Javed Bhai</p>
             </div>
         </div>
@@ -285,7 +250,6 @@
                 <option value="hi" style="color: #333;">हिन्दी</option>
                 <option value="ar" style="color: #333;">العربية</option>
             </select>
-           
             <a href="settings.html" class="setting-btn" title="Settings">⚙️</a>
         </div>
     </header>
@@ -301,43 +265,33 @@
         <div class="top-action-bar">
             <div class="page-title" id="txtPageTitle">Monthly Collection</div>
             <div class="action-controls">
-                <!-- Month Selector -->
                 <input type="month" id="monthSelector" class="month-selector" onchange="loadMonthlySummary()">
                 <button class="add-account-btn" id="btnAddEntry" onclick="openAddModal()">➕ Add</button>
             </div>
         </div>
 
-        <!-- Summary Cards Grid (Month-wise totals) -->
+        <!-- Summary Cards Grid -->
         <div class="collection-grid">
-            
-            <!-- 1. Month Cash Collection -->
             <div class="col-card">
                 <h3 id="lblCashTitle">Cash</h3>
                 <div class="amount" id="monthCashAmt">₹0.00</div>
                 <span class="icon">💵</span>
             </div>
-
-            <!-- 2. Month Online Collection -->
             <div class="col-card online">
                 <h3 id="lblOnlineTitle">Online</h3>
                 <div class="amount" id="monthOnlineAmt">₹0.00</div>
                 <span class="icon">📱</span>
             </div>
-
-            <!-- 3. Month Udhar -->
             <div class="col-card udhar">
                 <h3 id="lblUdharTitle">Udhar</h3>
                 <div class="amount" id="monthUdharAmt">₹0.00</div>
                 <span class="icon">📒</span>
             </div>
-
-            <!-- 4. Month Total Collection -->
             <div class="col-card total">
                 <h3 id="lblTotalTitle">Total Sale</h3>
                 <div class="amount" id="monthTotalAmt">₹0.00</div>
                 <span class="icon">📊</span>
             </div>
-
         </div>
 
         <!-- Transactions Log Table -->
@@ -359,7 +313,6 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 
     <!-- MODAL: FORM -->
@@ -386,7 +339,7 @@
         </div>
     </div>
 
-    <!-- Modern Bottom Navigation Bar with Center MGR Button -->
+    <!-- Modern Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <a href="dashboard.html" class="nav-item" id="navDash">
             <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
@@ -398,12 +351,12 @@
         </a>
 
         <!-- Center Elevated MGR Button -->
-     <a href="about.html" class="voice-center-container" title="About App">
-    <div class="voice-glow-ring"></div>
-    <button class="voice-round-btn">
-        <img src="logo.png" alt="App Info">
-    </button>
-</a>
+        <div class="voice-center-container" onclick="startVoiceAssistant()" title="Hey MGR Voice Assistant">
+            <div class="voice-glow-ring"></div>
+            <button class="voice-round-btn">
+                <img src="logo.png" alt="MGR">
+            </button>
+        </div>
 
         <a href="traders.html" class="nav-item" id="navTraders">
             <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
@@ -416,9 +369,20 @@
     </nav>
 
     <script>
+         // Firebase Configuration & Shop Path
+     const firebaseConfig = {
+        databaseURL: "https://fresh2cut-default-rtdb.firebaseio.com/"
+       };
+     if (!firebase.apps.length) {
+       firebase.initializeApp(firebaseConfig);
+    }
+    function getShopPath() {
+       let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
+       return 'licenses/' + shopCode;
+     }
         const translations = {
             en: {
-                back: "⬅️ Back",
+                back: "⬅️ Back to Dashboard",
                 title: "Monthly Collection",
                 addBtn: "➕ Add",
                 logTitle: "Entries Log",
@@ -443,7 +407,7 @@
                 noRecords: "No records found for this month."
             },
             hi: {
-                back: "⬅️ वापस",
+                back: "⬅️ डैशबोर्ड पर वापस जाएं",
                 title: "मासिक कलेक्शन",
                 addBtn: "➕ जोड़ें",
                 logTitle: "एंट्री लॉग",
@@ -468,7 +432,7 @@
                 noRecords: "इस महीने का कोई रिकॉर्ड नहीं मिला।"
             },
             ar: {
-                back: "⬅️ عودة",
+                back: "⬅️ العودة لوحة التحكم",
                 title: "التحصيل الشهري",
                 addBtn: "➕ إضافة",
                 logTitle: "سجل المدخلات",
@@ -526,7 +490,6 @@
         }
 
         /* MGR Voice Assistant Engine */
-/* MGR Voice Assistant Engine */
         function startVoiceAssistant() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -592,7 +555,6 @@
         function processMGRCommand(text) {
             let cleanText = text.toLowerCase().replace(/hey mgr|mgr|hi mgr|hai/g, "").trim();
             
-            // 1. Agar naya account ya customer banane ki baat ho
             if (cleanText.includes('naya') || cleanText.includes('new') || cleanText.includes('account') || cleanText.includes('khata')) {
                 let name = cleanText.replace(/naya|new|account|khata|banao|bana|karo|ka|ki/g, "").trim();
                 name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -600,7 +562,6 @@
                 return;
             }
 
-            // 2. Agar Jama / Payment lene ki baat ho
             if (cleanText.includes('jama') || cleanText.includes('mil gaya') || cleanText.includes('aaye') || cleanText.includes('payment')) {
                 let amountMatch = cleanText.match(/\d+/);
                 let amount = amountMatch ? amountMatch[0] : "0";
@@ -610,7 +571,6 @@
                 return;
             }
 
-            // 3. Agar Udhar add karne ki baat ho
             if (cleanText.includes('add') || cleanText.includes('likho') || cleanText.includes('udhar') || cleanText.includes('udhari')) {
                 let amountMatch = cleanText.match(/\d+/);
                 let amount = amountMatch ? amountMatch[0] : "0";
@@ -621,18 +581,15 @@
                 return;
             }
 
-            // 4. Agar Trader se judi baat ho
             if (cleanText.includes('trader') || cleanText.includes('maal') || cleanText.includes('party')) {
                 window.location.href = `traders.html?search=${encodeURIComponent(cleanText)}`;
                 return;
             }
 
-            // Default: Agar sirf naam ya search ho
             window.location.href = `udhar.html?search=${encodeURIComponent(cleanText)}`;
         }
-       
 
- function changeLanguage(lang) {
+        function changeLanguage(lang) {
             localStorage.setItem('chicken_lang', lang);
             setLanguage(lang);
             loadMonthlySummary();
@@ -685,14 +642,13 @@
         function closeAddModal() {
             document.getElementById('addModal').style.display = 'none';
         }
-
-        function saveFormEntry() {
+function saveFormEntry() {
             let date = document.getElementById('formDate').value;
             let cash = parseFloat(document.getElementById('formCash').value) || 0;
             let online = parseFloat(document.getElementById('formOnline').value) || 0;
             let udhar = parseFloat(document.getElementById('formUdhar').value) || 0;
             let totalSale = cash + online;
-
+           
             if(!date) {
                 alert('Please select a date');
                 return;
@@ -700,6 +656,7 @@
 
             let records = JSON.parse(localStorage.getItem('chicken_daily_records') || '[]');
             let newEntry = {
+                id: 'col_' + Date.now(),
                 date: date,
                 cash: cash,
                 online: online,
@@ -708,8 +665,17 @@
             };
             records.push(newEntry);
 
+            try {
+                firebase.database().ref(getShopPath() + '/collections/' + newEntry.id).set(newEntry);
+            } catch(e) {
+                console.error("Firebase save error:", e);
+            }
+
             localStorage.setItem('chicken_daily_records', JSON.stringify(records));
-            syncToSheet("Collection", [date, cash, online, udhar, totalSale]);
+            
+            try {
+                syncToSheet("Collection", [date, cash, online, udhar, totalSale]);
+            } catch(e) {}
             
             document.getElementById('monthSelector').value = date.substring(0, 7);
 
@@ -717,18 +683,20 @@
             loadMonthlySummary();
         }
 
-        function deleteRecord(index) {
+        function deleteRecord(recId) {
             let lang = localStorage.getItem('chicken_lang') || 'en';
             let msg = lang === 'hi' ? "क्या आप सच में ये एंट्री डिलीट करना चाहते हैं?" : (lang === 'ar' ? "هل أنت متأكد أنك تريد حذف هذا الإدخال؟" : "Are you sure you want to delete this entry?");
             
             if(confirm(msg)) {
                 let records = JSON.parse(localStorage.getItem('chicken_daily_records') || '[]');
-                let deletedItem = records.splice(index, 1)[0];
-                localStorage.setItem('chicken_daily_records', JSON.stringify(records));
-
-                syncToSheet("Collection", [deletedItem.date, -deletedItem.cash, -deletedItem.online, -deletedItem.udhar, -deletedItem.totalSale]);
-
-                loadMonthlySummary();
+                let index = records.findIndex(r => r.id === recId);
+                
+                if(index !== -1) {
+                    let deletedItem = records.splice(index, 1)[0];
+                    localStorage.setItem('chicken_daily_records', JSON.stringify(records));
+                    syncToSheet("Collection", [deletedItem.date, -deletedItem.cash, -deletedItem.online, -deletedItem.udhar, -deletedItem.totalSale]);
+                    loadMonthlySummary();
+                }
             }
         }
 
@@ -751,7 +719,7 @@
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#777; padding: 12px;">${t.noRecords}</td></tr>`;
             }
 
-            filteredRecords.forEach((item, originalIndex) => {
+            filteredRecords.forEach((item) => {
                 let c = parseFloat(item.cash) || 0;
                 let o = parseFloat(item.online) || 0;
                 let u = parseFloat(item.udhar) || 0;
@@ -768,7 +736,7 @@
                     <td style="color:#2980b9; font-weight:bold;">₹${o.toFixed(2)}</td>
                     <td style="color:#d9534f; font-weight:bold;">₹${u.toFixed(2)}</td>
                     <td style="color:#d68910; font-weight:bold;">₹${tSale.toFixed(2)}</td>
-                    <td><button class="del-btn" onclick="deleteRecord(${originalIndex})">${t.delBtn}</button></td>
+                    <td><button class="del-btn" onclick="deleteRecord('${item.id}')">${t.delBtn}</button></td>
                 `;
                 tbody.appendChild(tr);
             });

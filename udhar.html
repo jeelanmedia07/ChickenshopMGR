@@ -9,6 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#128161">
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <!-- html2canvas library for JPEG bill generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -461,6 +465,21 @@
     </nav>
 
     <script>
+        // --- FIREBASE INITIALIZATION & CONFIG ---
+        const firebaseConfig = {
+            databaseURL: "https://fresh2cut-default-rtdb.firebaseio.com/"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const rdb = firebase.database();
+
+        // Get Shop Code from localStorage or default
+      function getShopPath() {
+        let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
+        return 'licenses/' + shopCode;
+         }
+
         let currentCustomerId = null;
         let recognitionInstance = null;
 
@@ -473,7 +492,8 @@
             if(owner) document.getElementById('headerOwner').innerText = 'Owner: ' + owner;
             if(pic) document.getElementById('headerImg').src = pic;
 
-            loadCustomers();
+            // Load from Firebase Realtime DB and keep in sync
+            initFirebaseSync();
 
             // --- VOICE COMMAND URL PARAMETERS HANDLER ---
             const urlParams = new URLSearchParams(window.location.search);
@@ -484,7 +504,7 @@
                 let custId = 'cust_' + Date.now();
                 let newCust = { id: custId, name: newAccName, phone: '', pic: '' };
                 customers.push(newCust);
-                localStorage.setItem('chicken_customers', JSON.stringify(customers));
+                saveDataToCloud('customers', customers);
                 loadCustomers();
                 openCustomerDetail(custId);
             }
@@ -502,13 +522,13 @@
                     targetCustId = 'cust_' + Date.now();
                     let newCust = { id: targetCustId, name: addName, phone: '', pic: '' };
                     customers.push(newCust);
-                    localStorage.setItem('chicken_customers', JSON.stringify(customers));
+                    saveDataToCloud('customers', customers);
                 }
                 
                 let today = new Date().toISOString().split('T')[0];
                 let entries = JSON.parse(localStorage.getItem('chicken_entries_' + targetCustId) || '[]');
                 entries.push({ date: today, amount: parseFloat(addAmount), type: 'udhar' });
-                localStorage.setItem('chicken_entries_' + targetCustId, JSON.stringify(entries));
+                saveDataToCloud('entries_' + targetCustId, entries);
                 
                 loadCustomers();
                 openCustomerDetail(targetCustId);
@@ -524,7 +544,7 @@
                     let today = new Date().toISOString().split('T')[0];
                     let entries = JSON.parse(localStorage.getItem('chicken_entries_' + cust.id) || '[]');
                     entries.push({ date: today, amount: parseFloat(jamaAmount), type: 'jama' });
-                    localStorage.setItem('chicken_entries_' + cust.id, JSON.stringify(entries));
+                    saveDataToCloud('entries_' + cust.id, entries);
                     
                     loadCustomers();
                     openCustomerDetail(cust.id);
@@ -549,6 +569,50 @@
             }
         }
 
+        // --- FIREBASE SYNC FUNCTIONS ---
+        function initFirebaseSync() {
+            let shopPath = getShopPath();
+            
+            // Sync Customers
+            rdb.ref(shopPath + '/customers').on('value', (snapshot) => {
+                let data = snapshot.val();
+                if (data) {
+                    let custArray = Array.isArray(data) ? data : Object.values(data);
+                    localStorage.setItem('chicken_customers', JSON.stringify(custArray));
+                } else {
+                    localStorage.setItem('chicken_customers', JSON.stringify([]));
+                }
+                loadCustomers();
+                if (currentCustomerId) {
+                    loadCustomerHistory(currentCustomerId);
+                }
+            });
+
+            // Sync Entries for all customers
+            rdb.ref(shopPath).on('value', (snapshot) => {
+                let allData = snapshot.val();
+                if (allData) {
+                    for (let key in allData) {
+                        if (key.startsWith('entries_')) {
+                            let entriesArray = Array.isArray(allData[key]) ? allData[key] : Object.values(allData[key]);
+                            localStorage.setItem('chicken_' + key, JSON.stringify(entriesArray));
+                        }
+                    }
+                }
+                if (currentCustomerId) {
+                    loadCustomerHistory(currentCustomerId);
+                }
+            });
+        }
+
+        function saveDataToCloud(key, data) {
+            localStorage.setItem('chicken_' + key, JSON.stringify(data));
+            let shopPath = getShopPath();
+            rdb.ref(shopPath + '/' + key).set(data).catch(err => {
+                console.error("Firebase sync error:", err);
+            });
+        }
+
         /* --- RESTORE DATA FROM GOOGLE SHEET FUNCTION --- */
        function restoreDataFromSheet() {
             let sheetUrl = localStorage.getItem('chicken_deploy');
@@ -557,7 +621,7 @@
                 return;
             }
 
-            if (!confirm("Kya aap Google Sheet se sara data wapas restore karna chahte hain?")) {
+            if (!confirm("Kya aap Google Sheet से sara data wapas restore karna chahte hain?")) {
                 return;
             }
 
@@ -567,7 +631,7 @@
                     console.log("Fetched Data:", data);
 
                     if (!Array.isArray(data)) {
-                        alert("Google Sheet se sahi format mein data nahi mila. Web App URL ya Code check karein.");
+                        alert("Google Sheet se sahi format mein data nahi mila.");
                         return;
                     }
 
@@ -579,43 +643,44 @@
                     let customersMap = {};
                     let entriesMap = {};
 
-data.forEach(row => {
-    let custName = row['Customer Name'];
-    let date = row['Date'];
-    let type = row['Status']; // Aapki sheet mein column ka naam "Status" hai (udhar/jama)
-    let amount = parseFloat(row['Amount']) || 0;
+                    data.forEach(row => {
+                        let custName = row['Customer Name'];
+                        let date = row['Date'];
+                        let type = row['Status']; 
+                        let amount = parseFloat(row['Amount']) || 0;
 
-    if (custName) {
-        let custId = 'cust_' + custName.toLowerCase().replace(/\s+/g, '_');
-        
-        if (!customersMap[custId]) {
-            customersMap[custId] = {
-                id: custId,
-                name: custName,
-                phone: '',
-                pic: ''
-            };
-        }
+                        if (custName) {
+                            let custId = 'cust_' + custName.toLowerCase().replace(/\s+/g, '_');
+                            
+                            if (!customersMap[custId]) {
+                                customersMap[custId] = {
+                                    id: custId,
+                                    name: custName,
+                                    phone: '',
+                                    pic: ''
+                                };
+                            }
 
-        if (!entriesMap[custId]) {
-            entriesMap[custId] = [];
-        }
-        entriesMap[custId].push({ date: date, amount: amount, type: type });
-    }
-});
+                            if (!entriesMap[custId]) {
+                                entriesMap[custId] = [];
+                            }
+                            entriesMap[custId].push({ date: date, amount: amount, type: type });
+                        }
+                    });
+
                     let customersArray = Object.values(customersMap);
-                    localStorage.setItem('chicken_customers', JSON.stringify(customersArray));
+                    saveDataToCloud('customers', customersArray);
 
                     for (let custId in entriesMap) {
-                        localStorage.setItem('chicken_entries_' + custId, JSON.stringify(entriesMap[custId]));
+                        saveDataToCloud('entries_' + custId, entriesMap[custId]);
                     }
 
-                    alert("Data successfully restore ho gaya hai!");
+                    alert("Data successfully restore aur cloud par sync ho gaya hai!");
                     location.reload();
                 })
                 .catch(error => {
                     console.error("Restore error:", error);
-                    alert("Data restore karne mein error aaya. Console check karein.");
+                    alert("Data restore karne mein error aaya.");
                 });
         }
 
@@ -709,7 +774,7 @@ data.forEach(row => {
         function storeCustomerData(id, name, phone, pic, customers) {
             let newCust = { id: id, name: name, phone: phone, pic: pic };
             customers.push(newCust);
-            localStorage.setItem('chicken_customers', JSON.stringify(customers));
+            saveDataToCloud('customers', customers);
             closeAddAccountModal();
             loadCustomers();
         }
@@ -718,8 +783,13 @@ data.forEach(row => {
             if(confirm('Are you sure you want to delete this customer and all their records?')) {
                 let customers = JSON.parse(localStorage.getItem('chicken_customers') || '[]');
                 customers = customers.filter(c => c.id !== custId);
-                localStorage.setItem('chicken_customers', JSON.stringify(customers));
+                saveDataToCloud('customers', customers);
                 localStorage.removeItem('chicken_entries_' + custId);
+                
+                // Remove from Firebase Realtime DB
+                let shopPath = getShopPath();
+                rdb.ref(shopPath + '/entries_' + custId).remove();
+
                 loadCustomers();
             }
         }
@@ -830,7 +900,7 @@ data.forEach(row => {
             if(confirm('Are you sure you want to delete this transaction entry?')) {
                 let entries = JSON.parse(localStorage.getItem('chicken_entries_' + currentCustomerId) || '[]');
                 entries.splice(index, 1);
-                localStorage.setItem('chicken_entries_' + currentCustomerId, JSON.stringify(entries));
+                saveDataToCloud('entries_' + currentCustomerId, entries);
                 loadCustomerHistory(currentCustomerId);
             }
         }
@@ -864,7 +934,7 @@ data.forEach(row => {
             let newEntry = { date: date, amount: parseFloat(amount), type: type };
             entries.push(newEntry);
 
-            localStorage.setItem('chicken_entries_' + currentCustomerId, JSON.stringify(entries));
+            saveDataToCloud('entries_' + currentCustomerId, entries);
             closeAddEntryModal();
             loadCustomerHistory(currentCustomerId);
 
@@ -1006,7 +1076,7 @@ data.forEach(row => {
                     
                     if(cust) {
                         cust.pic = base64Image;
-                        localStorage.setItem('chicken_customers', JSON.stringify(customers));
+                        saveDataToCloud('customers', customers);
                         document.getElementById('detailCustImg').src = base64Image;
                         loadCustomers();
                         alert('Customer photo updated successfully!');
