@@ -15,16 +15,19 @@
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background: #f4fbf8; 
-            margin: 0; 
-            padding-bottom: 95px; 
-            opacity: 0; 
-            animation: fadeInPage 0.2s ease-in-out forwards; 
-            min-height: 100vh; 
             display: flex;     
             flex-direction: column; 
+            opacity: 0; 
+            animation: fadeInPage 0.2s ease-in-out forwards; 
         }
         
         @keyframes fadeInPage {
@@ -32,68 +35,121 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        header { background: #128161; color: white; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 999; width: 100%; }
+        header { 
+            background: url('Header Background.jpeg') no-repeat center center;
+            background-size: cover;
+            color: white; 
+            padding: 12px 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
+            flex-shrink: 0; 
+            z-index: 999; 
+            width: 100%; 
+        }
         .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
-        header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white; margin-right: 10px; background: #ddd; flex-shrink: 0; }
+        header img.profile-img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid white; margin-right: 10px; background: #ddd; flex-shrink: 0; }
         .shop-info { min-width: 0; overflow: hidden; }
-        .shop-info h2 { margin: 0; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
-        .shop-info p { margin: 2px 0 0 0; font-size: 10.5px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .shop-info h2 { margin: 0; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .shop-info p { margin: 2px 0 0 0; font-size: 10.5px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         
         .header-right-tools { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        .lang-select { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 6px; border-radius: 6px; font-size: 11px; cursor: pointer; outline: none; }
+        .lang-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 6px; border-radius: 6px; font-size: 11px; cursor: pointer; outline: none; }
         .lang-select option { color: #333; }
 
-        .setting-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 16px; padding: 5px 8px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-        .setting-btn:hover { background: rgba(255,255,255,0.3); }
+        .setting-btn { background: rgba(0,0,0,0.3); border: none; color: white; font-size: 16px; padding: 5px 8px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .setting-btn:hover { background: rgba(0,0,0,0.5); }
 
         .container { 
-            padding: 12px 10px; 
-            max-width: 450px; 
+            padding: 12px 10px 80px 10px; 
+            max-width: 480px; 
             margin: auto; 
             flex: 1; 
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-evenly;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
+        /* Attractive Panchang Card Styled Like Reference Image */
         .panchang-card {
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
             box-shadow: 0 2px 6px rgba(0,0,0,0.03);
             text-align: left;
         }
-        .panchang-normal { background: #e8f5e9; border: 1px solid #c8e6c9; }
-        .panchang-normal .panchang-header { color: #2e7d32; }
-        .panchang-normal .panchang-badge { background: #c8e6c9; color: #1b5e20; }
-
-        .panchang-alert { background: #ffebee; border: 1px solid #ffcdd2; }
-        .panchang-alert .panchang-header { color: #c62828; }
-        .panchang-alert .panchang-badge { background: #ffcdd2; color: #b71c1c; }
-
-        .panchang-header { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 4px; }
-        .panchang-body { font-size: 11px; color: #444; line-height: 1.35; }
-        .panchang-badge { padding: 2px 6px; border-radius: 4px; font-size: 9.5px; font-weight: bold; }
-        .alert-badge { background: #ffccbc; color: #d32f2f; }
+        .panchang-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .panchang-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panchang-calendar-icon {
+            width: 30px;
+            height: 30px;
+            background: #15803d;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: white;
+        }
+        .panchang-title-wrap h3 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #15803d;
+        }
+        .panchang-btn-link {
+            background: #15803d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 4px rgba(21, 128, 61, 0.2);
+        }
+        .panchang-body {
+            font-size: 11px;
+            color: #334155;
+            line-height: 1.4;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 6px;
+        }
+        .panchang-body p {
+            margin: 4px 0;
+        }
 
         .welcome-card {
             background: #ffffff;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 12px;
             text-align: center;
             box-shadow: 0 2px 8px rgba(18, 129, 97, 0.06);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             border: 1px solid #d4ece3;
         }
 
-        .welcome-card h1 { font-size: 13px; color: #128161; margin: 0 0 2px 0; font-weight: 700; }
-        .welcome-card p { font-size: 10px; color: #555; margin: 0 0 8px 0; line-height: 1.3; }
+        .welcome-card h1 { font-size: 13.5px; color: #128161; margin: 0 0 2px 0; font-weight: 700; }
+        .welcome-card p { font-size: 10.5px; color: #555; margin: 0 0 8px 0; line-height: 1.3; }
 
         .illustration-box {
             position: relative;
             background: #f4fbf8;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 3px;
             margin-bottom: 8px;
             display: flex;
@@ -101,14 +157,14 @@
             align-items: center;
             border: 1px dashed #b5e3d3;
             overflow: hidden;
-            height: 160px;
+            height: 150px;
         }
         
         .illustration-box video { 
             width: 100%; 
             height: 100%; 
-            border-radius: 4px; 
-            object-fit: fill; 
+            border-radius: 6px; 
+            object-fit: cover; 
         }
 
         .mute-toggle-btn {
@@ -131,8 +187,8 @@
             background: #128161;
             color: white;
             text-align: center;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 9px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
             font-size: 11.5px;
@@ -147,7 +203,7 @@
             color: white;
             text-align: center;
             padding: 7px;
-            border-radius: 6px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
             font-size: 11px;
@@ -157,22 +213,142 @@
         }
         .btn-backup-dash:hover { background: #225f5d; }
 
-        .quick-products {
+        /* App Features Section */
+        .features-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .features-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .features-header span:last-child {
+            font-size: 11.5px;
+            color: #128161;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .feature-card:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+        .feature-icon-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+            color: white;
+        }
+        .feature-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .feature-content h4 {
+            margin: 0 0 2px 0;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .feature-content p {
+            margin: 0;
+            font-size: 9.5px;
+            color: #64748b;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .feature-arrow {
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Summary Bar */
+        .summary-bar {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1.5px solid #86efac;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.08);
+        }
+        .summary-title {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #166534;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #bbf7d0;
+            padding-bottom: 6px;
+        }
+        .summary-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 8px;
         }
-        .product-mini-card {
-            background: white;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-            border: 1px solid #d4ece3;
+        .summary-box {
+            background: #ffffff;
+            border: 1px solid #dcfce7;
+            border-radius: 10px;
+            padding: 8px 4px;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
         }
-        .product-mini-card img { width: 100%; height: 55px; object-fit: cover; }
-        .product-mini-card span { display: block; font-size: 9px; font-weight: bold; color: #333; padding: 3px 2px; }
+        .summary-box:hover {
+            transform: translateY(-2px);
+        }
+        .summary-box span {
+            font-size: 9.5px;
+            color: #475569;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .summary-box h4 {
+            margin: 0;
+            font-size: 12px;
+            color: #15803d;
+            font-weight: 800;
+        }
 
         .bottom-nav { 
             position: fixed; 
@@ -187,6 +363,7 @@
             box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08); 
             border-top: 2px solid #d4ece3; 
             z-index: 99999; 
+            flex-shrink: 0;
         }
         .nav-item { flex: 1; text-align: center; padding: 4px 0; text-decoration: none; color: #555555; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; }
         .nav-item svg { width: 22px; height: 22px; margin-bottom: 2px; fill: #666666; }
@@ -226,7 +403,7 @@
 
     <header>
         <div class="header-left">
-            <img id="headerImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Profile">
+            <img id="headerImg" class="profile-img" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Profile">
             <div class="shop-info">
                 <h2 id="headerShop">कदीर चिकन सेंटर (KCC)</h2>
                 <p id="headerOwner">Owner: Javed Bhai</p>
@@ -244,13 +421,20 @@
     </header>
 
     <div class="container">
-       <div class="panchang-card panchang-normal" id="panchangCardBox">
-            <div class="panchang-header">
-                <span>🟢 मराठी पंचांग व उपवास अलर्ट</span>
-                <span class="panchang-badge" id="panchangBadge">तपासत आहे...</span>
+       <!-- Attractive Panchang / Aaj ki Jankari Card -->
+       <div class="panchang-card">
+            <div class="panchang-top-row">
+                <div class="panchang-title-wrap">
+                    <div class="panchang-calendar-icon">📅</div>
+                    <h3>आज की जानकारी</h3>
+                </div>
+                <a href="#" onclick="alert('पंचांग और उपवास की पूरी जानकारी यहाँ उपलब्ध है।'); return false;" class="panchang-btn-link">
+                    🟢 पंचांग &gt;
+                </a>
             </div>
             <div class="panchang-body" id="panchangText">
-                आज आणि उद्याच्या तिथीची माहिती लोड होत आहे...
+                <p>• <b>आज:</b> पंचांग जानकारी लोड हो रही है...</p>
+                <p>• <b>उद्या:</b> लोड हो रहा है...</p>
             </div>
         </div>
 
@@ -268,32 +452,108 @@
             <button onclick="exportAppData()" class="btn-backup-dash">📥 Save JSON Backup to Phone</button>
         </div>
 
-        <div class="quick-products">
-            <div class="product-mini-card">
-                <img src="leg piece.jpg" alt="Chicken Leg">
-                <span id="prodLeg">Leg Piece</span>
+        <!-- App Features Section -->
+        <div class="features-section">
+            <div class="features-header">
+                <span id="featTitle">ऐप की खास सुविधाएं</span>
+                <span onclick="alert('Sabhi features active hain!')">सभी देखें &gt;</span>
             </div>
-            <div class="product-mini-card">
-                <img src="Boneless Chicken.png" alt="Chicken Boneless">
-                <span id="prodBoneless">Boneless</span>
+            <div class="features-grid">
+                <a href="collection.html" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #16a34a;">📈</div>
+                    <div class="feature-content">
+                        <h4>बिक्री ट्रैकिंग</h4>
+                        <p>दैनिक बिक्री, कुल वजन और पक्षियों का हिसाब</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
+
+                <a href="udhar.html" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #2563eb;">🪙</div>
+                    <div class="feature-content">
+                        <h4>उधारी मैनेजमेंट</h4>
+                        <p>ग्राहक उधारी, भुगतान और हिसाब</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
+
+                <a href="traders.html" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #7c3aed;">👥</div>
+                    <div class="feature-content">
+                        <h4>ट्रेडर्स डिटेल्स</h4>
+                        <p>ट्रेडर की जानकारी और सप्लाई रिकॉर्ड्स</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
+
+                <a href="settings.html" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #ea580c;">🚚</div>
+                    <div class="feature-content">
+                        <h4>इन्वेंटरी / स्टॉक</h4>
+                        <p>स्टॉक, खरीद और वजन मैनेजमेंट</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
+
+                <a href="collection.html" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #059669;">🧾</div>
+                    <div class="feature-content">
+                        <h4>बिल / इन्वॉइस</h4>
+                        <p>ग्राहक के लिए डिजिटल बिल बनाएं</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
+
+                <a href="collection.html" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #dc2626;">📊</div>
+                    <div class="feature-content">
+                        <h4>रिपोर्ट्स & एनालिटिक्स</h4>
+                        <p>डाटा से बेहतर फैसले लें</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
+
+                <a href="#" onclick="exportAppData(); return false;" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #0d9488;">☁️</div>
+                    <div class="feature-content">
+                        <h4>डाटा बैकअप</h4>
+                        <p>आपका डाटा हमेशा सुरक्षित</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
+
+                <a href="about.html" class="feature-card">
+                    <div class="feature-icon-circle" style="background: #2563eb;">ℹ️</div>
+                    <div class="feature-content">
+                        <h4>हमारे बारे में</h4>
+                        <p>KCC की कहानी, लक्ष्य और विजन</p>
+                    </div>
+                    <div class="feature-arrow">&gt;</div>
+                </a>
             </div>
-            <div class="product-mini-card">
-                <img src="Kalezi.png" alt="Chicken Liver">
-                <span id="prodLiver">Liver / Kaleji</span>
+        </div>
+
+        <!-- Fully Automated Attractive Summary Bar with Requested Sequence -->
+        <div class="summary-bar">
+            <div class="summary-title">
+                <span>📊 आज का सारांश (Today's Summary)</span>
+                <span id="summaryDateLabel" style="font-size: 10px; color: #166534; font-weight: 600;">Live Sync</span>
             </div>
-            <div class="product-mini-card">
-                <img src="Chicken Wings.jpg" alt="Chicken Wings">
-                <span>Chicken Wings</span>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <span>🐔 1. आज का कुल पक्षी</span>
+                    <h4 id="statTotalBirds">0 पक्षी</h4>
+                </div>
+                <div class="summary-box">
+                    <span>🤝 2. आज का कुल पेमेंट</span>
+                    <h4 id="statTradersPayment">₹0</h4>
+                </div>
+                <div class="summary-box">
+                    <span>⚖️ 3. आज का कुल वजन</span>
+                    <h4 id="statTotalWeight">0 Kg</h4>
+                </div>
             </div>
-            <div class="product-mini-card">
-                <img src="Chicken Kheema.png" alt="Chicken Kheema">
-                <span>Chicken Kheema</span>
-            </div>
-            <div class="product-mini-card">
-                <img src="Chunal.jpg" alt="Chunal">
-                <span>Chunal</span>
-            </div>
-         </div>
+        </div>
     </div>
 
     <nav class="bottom-nav">
@@ -324,31 +584,29 @@
     </nav>
 
     <script>
-        // ==========================================
-        // FIREBASE CLOUD CONFIGURATION & SYNC SETUP
-        // ==========================================
         const firebaseConfig = {
-            databaseURL: "https://chickenshopmgr-default-rtdb.firebaseio.com/" // अपनी Firebase Realtime Database URL यहाँ डालें
+            databaseURL: "https://chickenshopmgr-default-rtdb.firebaseio.com/"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
 
-        // दुकान का यूनिक कोड या आईडी प्राप्त करना (लोकल स्टोरेज से)
         function getActiveShopCode() {
             let code = localStorage.getItem('chicken_shop_code') || localStorage.getItem('shop_code') || 'kcc_default_shop';
-            return code.trim().replace(/[\.#$\[\]]/g, "_"); // सेफ पाथ के लिए स्पेशल कैरेक्टर हटाना
+            return code.trim().replace(/[\.#$\[\]]/g, "_");
         }
 
-        // क्लाउड से डेटा सिंक करने का फंक्शन (Realtime Sync)
+        function getShopPath() {
+            let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
+            return 'licenses/' + shopCode;
+        }
+
         function syncDataWithCloud() {
             const shopCode = getActiveShopCode();
             const shopRef = db.ref('shops/' + shopCode);
 
-            // 1. लोकल डेटा को क्लाउड पर भेजना (Push)
             const appData = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
@@ -360,7 +618,6 @@
             }
             shopRef.set(appData).catch(err => console.log("Cloud sync push error:", err));
 
-            // 2. क्लाउड से लेटेस्ट डेटा सुनना और लोकल स्टोरेज में अपडेट करना (Pull / Realtime Listener)
             shopRef.on('value', (snapshot) => {
                 const cloudData = snapshot.val();
                 if (cloudData) {
@@ -375,6 +632,7 @@
                         }
                     }
                 }
+                calculateAutomaticSummary();
             });
         }
 
@@ -383,9 +641,7 @@
                 welcomeTitle: "Welcome to chickenMGR Digital Management!",
                 welcomeSub: "Manage your sales, udhar, and traders with ease.",
                 btnGetStarted: "Get Started with Digital Management",
-                prodLeg: "Leg Piece",
-                prodBoneless: "Boneless",
-                prodLiver: "Liver / Kaleji",
+                featTitle: "App Key Features",
                 navDash: "Dashboard",
                 navUdhar: "Udhar",
                 navTraders: "Traders",
@@ -395,9 +651,7 @@
                 welcomeTitle: "chickenMGR डिजिटल मैनेजमेंट में आपका स्वागत है!",
                 welcomeSub: "अपनी बिक्री, उधार और ट्रेडर्स को आसानी से मैनेज करें।",
                 btnGetStarted: "डिजिटल मैनेजमेंट के साथ शुरू करें",
-                prodLeg: "लेग पीस",
-                prodBoneless: "बोनेलेस",
-                prodLiver: "कलेजी / लिवर",
+                featTitle: "ऐप की खास सुविधाएं",
                 navDash: "डैशबोर्ड",
                 navUdhar: "उधार",
                 navTraders: "ट्रेडर्स",
@@ -407,9 +661,7 @@
                 welcomeTitle: "مرحبًا بك في chickenMGR Digital Management!",
                 welcomeSub: "إدارة المبيعات والديون والموردين بكل سهولة.",
                 btnGetStarted: "ابدأ مع الإدارة الرقمية",
-                prodLeg: "قطعة فخذ",
-                prodBoneless: "بونلس",
-                prodLiver: "كبدة",
+                featTitle: "مميزات التطبيق",
                 navDash: "لوحة التحكم",
                 navUdhar: "الديون",
                 navTraders: "الموردين",
@@ -438,9 +690,80 @@
 
             checkSmartPanchang();
             initVideoPlayer();
+            calculateAutomaticSummary();
 
-            // Firebase क्लाउड सिंक चालू करें
+            initLiveTradersSync();
             syncDataWithCloud();
+        }
+
+        function initLiveTradersSync() {
+            try {
+                db.ref(getShopPath() + '/traders').on('value', (snapshot) => {
+                    let data = snapshot.val();
+                    let traders = data ? Object.values(data) : [];
+                    localStorage.setItem('chicken_traders', JSON.stringify(traders));
+                    calculateAutomaticSummary();
+                });
+
+                db.ref(getShopPath() + '/traders_entries').on('value', (snapshot) => {
+                    let data = snapshot.val() || {};
+                    for(let trdId in data) {
+                        localStorage.setItem('chicken_trader_entries_' + trdId, JSON.stringify(Object.values(data[trdId])));
+                    }
+                    calculateAutomaticSummary();
+                });
+            } catch(e) {
+                console.log("Live sync error:", e);
+            }
+        }
+
+        function calculateAutomaticSummary() {
+            try {
+                let todayDateStr = new Date().toISOString().split('T')[0];
+                let totalTodayBirds = 0;
+                let totalTodayWeight = 0;
+                let totalTodayTradersAmount = 0;
+
+                // Traders data se sirf aaj ki entries nikalna
+                let traders = JSON.parse(localStorage.getItem('chicken_traders') || '[]');
+                
+                traders.forEach(trd => {
+                    let entries = JSON.parse(localStorage.getItem('chicken_trader_entries_' + trd.id) || '[]');
+                    
+                    // Sirf aaj ki date ki entries filter karein
+                    let todayEntries = entries.filter(e => e.date === todayDateStr);
+                    
+                    todayEntries.forEach(entry => {
+                        totalTodayBirds += parseFloat(entry.bird || 0);
+                        totalTodayWeight += parseFloat(entry.weight || 0);
+                        totalTodayTradersAmount += parseFloat(entry.amount || 0);
+                    });
+                });
+
+                // 1. Aaj ka total bird update
+                if (totalTodayBirds === 0) {
+                    document.getElementById('statTotalBirds').innerText = "0 पक्षी";
+                } else {
+                    document.getElementById('statTotalBirds').innerText = totalTodayBirds + " पक्षी";
+                }
+
+                // 2. Aaj ka total payment update
+                if (totalTodayTradersAmount === 0) {
+                    document.getElementById('statTradersPayment').innerText = "₹0";
+                } else {
+                    document.getElementById('statTradersPayment').innerText = "₹" + totalTodayTradersAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+
+                // 3. Aaj ka total weight update
+                if (totalTodayWeight === 0) {
+                    document.getElementById('statTotalWeight').innerText = "0 Kg";
+                } else {
+                    document.getElementById('statTotalWeight').innerText = totalTodayWeight.toFixed(2) + " Kg";
+                }
+
+            } catch (err) {
+                console.log("Error calculating automatic summary:", err);
+            }
         }
 
         function initVideoPlayer() {
@@ -484,40 +807,25 @@
             let todayInfo = datesToCheck[0];
             let tomorrowInfo = datesToCheck[1];
 
-            let htmlContent = `• <b>आज (${todayInfo.formatted}):</b> `;
-            let badgeText = "नॉर्मल दिवस";
-            let badgeClass = "panchang-badge";
-            let cardBoxClass = "panchang-card panchang-normal";
-
+            let htmlContent = `<p>• <b>आज (${todayInfo.formatted}):</b> `;
             if(todayInfo.dayOfWeek === 1) {
-                htmlContent += `सोमवार उपवास / शिस्तीचा दिवस.<br>`;
-                badgeText = "सोमवार (उपवास)";
+                htmlContent += `सोमवार उपवास / शिस्तीचा दिवस.`;
             } else if(todayInfo.dayOfWeek === 4) {
-                htmlContent += `गुरुवार - शाकाहारी दिवस.<br>`;
-                badgeText = "गुरुवार (शाकाहारी)";
+                htmlContent += `गुरुवार - शाकाहारी दिवस.`;
             } else {
-                htmlContent += `विक्रीसाठी सर्वसाधारण दिवस.<br>`;
+                htmlContent += `विक्रीसाठी सर्वसाधारण दिवस.`;
             }
-
-            htmlContent += `<br>• <b>उद्या (${tomorrowInfo.formatted}):</b> `;
+            htmlContent += `</p><p>• <b>उद्या (${tomorrowInfo.formatted}):</b> `;
             if(tomorrowInfo.dayOfWeek === 1) {
                 htmlContent += `⚠️ सोमवार उपवास आहे! कटिंग बेताने ठेवा.`;
-                badgeText = "उपवास अलर्ट!";
-                badgeClass = "panchang-badge alert-badge";
-                cardBoxClass = "panchang-card panchang-alert";
             } else if(tomorrowInfo.dayOfWeek === 4) {
                 htmlContent += `⚠️ गुरुवार (शाकाहारी दिवस) आहे!`;
-                badgeText = "शाकाहारी अलर्ट!";
-                badgeClass = "panchang-badge alert-badge";
-                cardBoxClass = "panchang-card panchang-alert";
             } else {
                 htmlContent += `सर्वसाधारण दिवस आहे.`;
             }
+            htmlContent += `</p>`;
 
             document.getElementById('panchangText').innerHTML = htmlContent;
-            document.getElementById('panchangBadge').innerText = badgeText;
-            document.getElementById('panchangBadge').className = badgeClass;
-            document.getElementById('panchangCardBox').className = cardBoxClass;
         }
 
         function exportAppData() {
@@ -556,9 +864,7 @@
             document.getElementById('welcomeTitle').innerText = t.welcomeTitle;
             document.getElementById('welcomeSub').innerText = t.welcomeSub;
             document.getElementById('btnGetStarted').innerText = t.btnGetStarted;
-            document.getElementById('prodLeg').innerText = t.prodLeg;
-            document.getElementById('prodBoneless').innerText = t.prodBoneless;
-            document.getElementById('prodLiver').innerText = t.prodLiver;
+            document.getElementById('featTitle').innerText = t.featTitle;
             document.getElementById('txtDash').innerText = t.navDash;
             document.getElementById('txtUdhar').innerText = t.navUdhar;
             document.getElementById('txtTraders').innerText = t.navTraders;

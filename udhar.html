@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>Chicken Shop MGR - Udhar Management</title>
 
     <!-- PWA Manifest Link -->
@@ -18,14 +18,17 @@
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
        body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background: #f4fbf8; 
-            margin: 0; 
-            padding-bottom: 110px; 
             opacity: 0; 
             animation: fadeInPage 0.2s ease-in-out forwards; 
-            min-height: 100vh; 
             display: flex;     
             flex-direction: column; 
         }
@@ -35,25 +38,63 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        header { background: #128161; color: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: none; position: sticky; top: 0; z-index: 999; width: 100%; }
+        header { 
+            background: url('Header Background.jpeg') no-repeat center center;
+            background-size: cover;
+            color: white; 
+            padding: 12px 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
+            position: sticky; 
+            top: 0; 
+            z-index: 999; 
+            width: 100%; 
+            flex-shrink: 0;
+        }
         .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
         header img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; margin-right: 12px; background: #ddd; flex-shrink: 0; }
         .shop-info { min-width: 0; overflow: hidden; }
-        .shop-info h2 { margin: 0; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
-        .shop-info p { margin: 2px 0 0 0; font-size: 11px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .shop-info h2 { margin: 0; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .shop-info p { margin: 2px 0 0 0; font-size: 11px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         
         .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .setting-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 18px; padding: 6px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-        .setting-btn:hover { background: rgba(255,255,255,0.3); }
-        .lang-select { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; outline: none; }
+        .setting-btn { background: rgba(0,0,0,0.3); border: none; color: white; font-size: 18px; padding: 6px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .setting-btn:hover { background: rgba(0,0,0,0.5); }
+        .lang-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; outline: none; }
         .lang-select option { color: #333; }
 
         .container { 
-            padding: 10px; 
+            padding: 12px 10px 80px 10px; 
             max-width: 450px; 
             margin: auto; 
             flex: 1;
             width: 100%; 
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Attractive Back to Dashboard Button */
+        .back-dashboard-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #128161 0%, #0e664d 100%);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 11.5px;
+            box-shadow: 0 3px 8px rgba(18, 129, 97, 0.25);
+            border: 1px solid #16a34a;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+        .back-dashboard-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(18, 129, 97, 0.35);
         }
 
         .top-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
@@ -66,7 +107,7 @@
         .restore-btn { background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
         .restore-btn:hover { background: #2980b9; }
 
-        .search-bar-container { background: white; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border: 1px solid #d4ece3; }
+        .search-bar-container { background: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border: 1px solid #d4ece3; }
         .search-bar-container span { font-size: 14px; color: #777; }
         .search-bar-container input { width: 100%; border: none; outline: none; font-size: 12px; color: #333; background: transparent; }
 
@@ -138,13 +179,13 @@
         .invoice-table th { background: #f4fbf8; color: #128161; }
         .invoice-total { text-align: right; font-size: 13px; font-weight: bold; margin-top: 8px; color: #d9534f; }
 
-        /* Modern Bottom Navigation Bar with Vector Icons */
+        /* Modern Fixed Bottom Navigation Bar */
         .bottom-nav { 
             position: fixed; 
             bottom: 0; 
             left: 0; 
             width: 100%; 
-            height: 70px; 
+            height: 60px; 
             background: #ffffff; 
             display: flex; 
             justify-content: space-around;
@@ -152,15 +193,16 @@
             box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08); 
             border-top: 2px solid #d4ece3; 
             z-index: 99999; 
+            flex-shrink: 0;
         }
 
         .nav-item { 
             flex: 1; 
             text-align: center; 
-            padding: 6px 0; 
+            padding: 4px 0; 
             text-decoration: none; 
             color: #555555; 
-            font-size: 12px; 
+            font-size: 11px; 
             font-weight: 700; 
             display: flex; 
             flex-direction: column; 
@@ -169,9 +211,9 @@
         }
 
         .nav-item svg {
-            width: 26px;
-            height: 26px;
-            margin-bottom: 3px;
+            width: 22px;
+            height: 22px;
+            margin-bottom: 2px;
             fill: #666666;
             transition: all 0.2s ease;
         }
@@ -182,20 +224,13 @@
 
         .nav-item.active svg {
             fill: #128161;
-            transform: translateY(-2px);
-        }
-
-        .nav-item:hover {
-            color: #128161;
-        }
-        .nav-item:hover svg {
-            fill: #128161;
+            transform: translateY(-1px);
         }
 
         /* Center Elevated MGR Button */
         .voice-center-container {
             position: relative;
-            top: -22px;
+            top: -18px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -233,55 +268,12 @@
         }
         @keyframes pulse-glow {
             0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 0.2; }
+            50% { transform: scale(1.15); opacity: 0.2; }
             100% { transform: scale(1); opacity: 0.8; }
-        }
-
-        /* Voice Listening Popup Overlay */
-        #voiceModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: white;
-            font-family: inherit;
-        }
-        .voice-popup-box {
-            background: white;
-            color: #333;
-            padding: 25px;
-            border-radius: 16px;
-            text-align: center;
-            width: 85%;
-            max-width: 320px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .mic-wave {
-            font-size: 40px;
-            margin-bottom: 10px;
-            animation: bounceMic 1s infinite alternate;
-        }
-        @keyframes bounceMic {
-            from { transform: translateY(0); }
-            to { transform: translateY(-8px); }
         }
     </style>
 </head>
 <body>
-
-    <!-- Voice Listening Modal Popup -->
-    <div id="voiceModal">
-        <div class="voice-popup-box">
-            <div class="mic-wave">🎙️</div>
-            <h3 style="margin: 0 0 8px 0; color: #128161;">MGR Sun Raha Hai...</h3>
-            <p id="speechStatusText" style="font-size: 13px; color: #666; margin: 0 0 15px 0;">Hey MGR, boliye kya karna hai?</p>
-            <button onclick="stopVoiceAssistant()" style="background: #ff4757; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">Band Karein</button>
-        </div>
-    </div>
 
     <header>
         <div class="header-left">
@@ -302,8 +294,8 @@
     </header>
 
     <div class="container">
-        <div style="margin-bottom: 10px;">
-            <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 4px; background: #fff; color: #128161; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #128161;">
+        <div>
+            <a href="dashboard.html" class="back-dashboard-btn">
                 ⬅️ Back to Dashboard
             </a>
         </div>
@@ -435,7 +427,7 @@
         </div>
     </div>
 
-    <!-- Modern Bottom Navigation Bar with Vector Icons & Center MGR Button -->
+    <!-- Modern Fixed Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <a href="dashboard.html" class="nav-item" id="navDash">
             <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
@@ -465,7 +457,6 @@
     </nav>
 
     <script>
-        // --- FIREBASE INITIALIZATION & CONFIG ---
         const firebaseConfig = {
             databaseURL: "https://chickenshopmgr-default-rtdb.firebaseio.com/"
         };
@@ -474,14 +465,12 @@
         }
         const rdb = firebase.database();
 
-        // Get Shop Code from localStorage or default
-      function getShopPath() {
-        let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
-        return 'licenses/' + shopCode;
-         }
+        function getShopPath() {
+            let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
+            return 'licenses/' + shopCode;
+        }
 
         let currentCustomerId = null;
-        let recognitionInstance = null;
 
         window.onload = function() {
             let shop = localStorage.getItem('chicken_shop');
@@ -492,12 +481,9 @@
             if(owner) document.getElementById('headerOwner').innerText = 'Owner: ' + owner;
             if(pic) document.getElementById('headerImg').src = pic;
 
-            // Load from Firebase Realtime DB and keep in sync
             initFirebaseSync();
 
-            // --- VOICE COMMAND URL PARAMETERS HANDLER ---
             const urlParams = new URLSearchParams(window.location.search);
-            
             let newAccName = urlParams.get('new_account');
             if (newAccName) {
                 let customers = JSON.parse(localStorage.getItem('chicken_customers') || '[]');
@@ -562,18 +548,11 @@
             let savedLang = localStorage.getItem('chicken_lang') || 'en';
             document.getElementById('langSelect').value = savedLang;
             applyLanguage(savedLang);
-          
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(() => console.log("Service Worker Registered Successfully"));
-            }
         }
 
-        // --- FIREBASE SYNC FUNCTIONS ---
         function initFirebaseSync() {
             let shopPath = getShopPath();
             
-            // Sync Customers
             rdb.ref(shopPath + '/customers').on('value', (snapshot) => {
                 let data = snapshot.val();
                 if (data) {
@@ -588,7 +567,6 @@
                 }
             });
 
-            // Sync Entries for all customers
             rdb.ref(shopPath).on('value', (snapshot) => {
                 let allData = snapshot.val();
                 if (allData) {
@@ -613,29 +591,21 @@
             });
         }
 
-        /* --- RESTORE DATA FROM GOOGLE SHEET FUNCTION --- */
-       function restoreDataFromSheet() {
+        function restoreDataFromSheet() {
             let sheetUrl = localStorage.getItem('chicken_deploy');
             if (!sheetUrl || !sheetUrl.startsWith('http')) {
                 alert("Google Sheet deployment URL nahi mila! Kripya Settings mein jaakar URL save karein.");
                 return;
             }
 
-            if (!confirm("Kya aap Google Sheet से sara data wapas restore karna chahte hain?")) {
+            if (!confirm("Kya aap Google Sheet se sara data wapas restore karna chahte hain?")) {
                 return;
             }
 
             fetch(sheetUrl)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("Fetched Data:", data);
-
-                    if (!Array.isArray(data)) {
-                        alert("Google Sheet se sahi format mein data nahi mila.");
-                        return;
-                    }
-
-                    if (data.length === 0) {
+                    if (!Array.isArray(data) || data.length === 0) {
                         alert("Google Sheet par koi data nahi mila.");
                         return;
                     }
@@ -786,7 +756,6 @@
                 saveDataToCloud('customers', customers);
                 localStorage.removeItem('chicken_entries_' + custId);
                 
-                // Remove from Firebase Realtime DB
                 let shopPath = getShopPath();
                 rdb.ref(shopPath + '/entries_' + custId).remove();
 

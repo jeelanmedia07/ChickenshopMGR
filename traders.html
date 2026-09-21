@@ -15,14 +15,17 @@
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background: #f4fbf8; 
-            margin: 0; 
-            padding-bottom: 110px; 
             opacity: 0; 
             animation: fadeInPage 0.2s ease-in-out forwards; 
-            min-height: 100vh; 
             display: flex;     
             flex-direction: column; 
         }
@@ -32,26 +35,63 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Dashboard Exact Header Style */
-        header { background: #128161; color: white; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: none; position: sticky; top: 0; z-index: 999; width: 100%; }
+        header { 
+            background: url('Header Background.jpeg') no-repeat center center;
+            background-size: cover;
+            color: white; 
+            padding: 12px 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
+            position: sticky; 
+            top: 0; 
+            z-index: 999; 
+            width: 100%; 
+            flex-shrink: 0;
+        }
         .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
         header img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; margin-right: 12px; background: #ddd; flex-shrink: 0; }
         .shop-info { min-width: 0; overflow: hidden; }
-        .shop-info h2 { margin: 0; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
-        .shop-info p { margin: 2px 0 0 0; font-size: 11px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .shop-info h2 { margin: 0; font-size: 16px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .shop-info p { margin: 2px 0 0 0; font-size: 11px; color: #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         
         .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .setting-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 18px; padding: 6px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-        .setting-btn:hover { background: rgba(255,255,255,0.3); }
-        .lang-select { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; outline: none; }
+        .setting-btn { background: rgba(0,0,0,0.3); border: none; color: white; font-size: 18px; padding: 6px 10px; border-radius: 6px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .setting-btn:hover { background: rgba(0,0,0,0.5); }
+        .lang-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; outline: none; }
         .lang-select option { color: #333; }
 
         .container { 
-            padding: 10px; 
+            padding: 12px 10px 80px 10px; 
             max-width: 450px; 
             margin: auto; 
             flex: 1;
             width: 100%; 
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Attractive Back to Dashboard Button */
+        .back-dashboard-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #128161 0%, #0e664d 100%);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 11.5px;
+            box-shadow: 0 3px 8px rgba(18, 129, 97, 0.25);
+            border: 1px solid #16a34a;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+        .back-dashboard-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(18, 129, 97, 0.35);
         }
 
         /* Top Action Bar */
@@ -61,7 +101,7 @@
         .add-account-btn:hover { background: #0e664d; }
 
         /* Search Bar */
-        .search-bar-container { background: white; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border: 1px solid #d4ece3; }
+        .search-bar-container { background: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border: 1px solid #d4ece3; }
         .search-bar-container span { font-size: 14px; color: #777; }
         .search-bar-container input { width: 100%; border: none; outline: none; font-size: 12px; color: #333; background: transparent; }
 
@@ -122,13 +162,13 @@
 
         .modal-buttons { display: flex; justify-content: flex-end; gap: 8px; }
 
-        /* Modern Bottom Navigation Bar with Vector Infos */
+        /* Modern Fixed Bottom Navigation Bar */
         .bottom-nav { 
             position: fixed; 
             bottom: 0; 
             left: 0; 
             width: 100%; 
-            height: 70px; 
+            height: 60px; 
             background: #ffffff; 
             display: flex; 
             justify-content: space-around;
@@ -136,15 +176,16 @@
             box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08); 
             border-top: 2px solid #d4ece3; 
             z-index: 99999; 
+            flex-shrink: 0;
         }
 
         .nav-item { 
             flex: 1; 
             text-align: center; 
-            padding: 6px 0; 
+            padding: 4px 0; 
             text-decoration: none; 
             color: #555555; 
-            font-size: 12px; 
+            font-size: 11px; 
             font-weight: 700; 
             display: flex; 
             flex-direction: column; 
@@ -153,9 +194,9 @@
         }
 
         .nav-item svg {
-            width: 26px;
-            height: 26px;
-            margin-bottom: 3px;
+            width: 22px;
+            height: 22px;
+            margin-bottom: 2px;
             fill: #666666;
             transition: all 0.2s ease;
         }
@@ -166,20 +207,13 @@
 
         .nav-item.active svg {
             fill: #128161;
-            transform: translateY(-2px);
-        }
-
-        .nav-item:hover {
-            color: #128161;
-        }
-        .nav-item:hover svg {
-            fill: #128161;
+            transform: translateY(-1px);
         }
 
         /* Center Elevated MGR Button */
         .voice-center-container {
             position: relative;
-            top: -22px;
+            top: -18px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -217,7 +251,7 @@
 
         @keyframes pulse-glow {
             0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 0.2; }
+            50% { transform: scale(1.15); opacity: 0.2; }
             100% { transform: scale(1); opacity: 0.8; }
         }
 
@@ -288,8 +322,8 @@
 
     <div class="container">
         <!-- Back to Dashboard Button -->
-        <div style="margin-bottom: 10px;">
-            <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 4px; background: #fff; color: #128161; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #128161;">
+        <div>
+            <a href="dashboard.html" class="back-dashboard-btn">
                 ⬅️ Back to Dashboard
             </a>
         </div>
@@ -415,7 +449,7 @@
         </div>
     </div>
 
-    <!-- Modern Bottom Navigation Bar with Vector Icons & Center MGR Button -->
+    <!-- Modern Fixed Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <a href="dashboard.html" class="nav-item" id="navDash">
             <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
@@ -445,7 +479,6 @@
     </nav>
 
     <script>
-        // --- Firebase Initialization & Config ---
         const firebaseConfig = {
             databaseURL: "https://chickenshopmgr-default-rtdb.firebaseio.com/"
         };
@@ -455,9 +488,9 @@
         const db = firebase.database();
 
         function getShopPath() {
-        let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
-        return 'licenses/' + shopCode;
-      }
+            let shopCode = localStorage.getItem('chicken_shop_code') || 'CSMGR-001';
+            return 'licenses/' + shopCode;
+        }
         let currentTraderId = null;
         let recognitionInstance = null;
 
@@ -482,9 +515,7 @@
             }
         }
 
-        // --- Firebase Realtime Sync ---
         function initFirebaseSync() {
-            // Sync Traders List
             db.ref(getShopPath() + '/traders').on('value', (snapshot) => {
                 let data = snapshot.val();
                 let traders = data ? Object.values(data) : [];
@@ -495,7 +526,6 @@
                 }
             });
 
-            // Sync Trader Entries
             db.ref(getShopPath() + '/traders_entries').on('value', (snapshot) => {
                 let data = snapshot.val() || {};
                 for(let trdId in data) {
@@ -508,7 +538,6 @@
             });
         }
 
-        /* MGR Voice Assistant Engine */
         function startVoiceAssistant() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -562,7 +591,7 @@
             } catch(e) {
                 console.error(e);
                 document.getElementById('voiceModal').style.display = 'none';
-                alert("Microphone shuru karne mein samasya aayi. Check karein ki site HTTPS par chal rahi hai ya nahi.");
+                alert("Microphone shuru karne mein samasya aayi.");
             }
         }
 
@@ -699,7 +728,6 @@
             traders.push(newTrd);
             localStorage.setItem('chicken_traders', JSON.stringify(traders));
 
-            // Sync to Firebase
             let tradersObj = {};
             traders.forEach(t => tradersObj[t.id] = t);
             db.ref(getShopPath() + '/traders').set(tradersObj);
@@ -950,7 +978,6 @@
 
             localStorage.setItem('chicken_trader_entries_' + currentTraderId, JSON.stringify(entries));
 
-            // Sync entries to Firebase
             let entriesObj = {};
             entries.forEach((e, idx) => entriesObj[idx] = e);
             db.ref(getShopPath() + '/traders_entries/' + currentTraderId).set(entriesObj);
@@ -993,7 +1020,7 @@
         function applyLanguage(lang) {
             const texts = {
                 en: { traders: "Traders / Suppliers", addAcc: "Add New Account", search: "Search Trader...", navDash: "Dashboard", navUdhar: "Udhar", navTradersNav: "Traders", navCollection: "Collection" },
-                mr: { traders: "व्यापारी (Traders)", addAcc: "नवीन खाते जोडा", search: "व्यापari शोधा...", navDash: "डैशबोर्ड", navUdhar: "उधार", navTradersNav: "व्यापारी", navCollection: "कलेक्शन" },
+                mr: { traders: "व्यापारी (Traders)", addAcc: "नवीन खाते جوडा", search: "व्यापari शोधा...", navDash: "डैशबोर्ड", navUdhar: "उधार", navTradersNav: "व्यापारी", navCollection: "कलेक्शन" },
                 ar: { traders: "الموردين", addAcc: "إضافة حساب جديد", search: "بحث عن مورد...", navDash: "لوحة التحكم", navUdhar: "الديون", navTradersNav: "الموردين", navCollection: "التحصيل" }
             };
             let t = texts[lang] || texts.en;
