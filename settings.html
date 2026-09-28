@@ -28,8 +28,19 @@
         button { background: #128161; color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         button:hover { background: #0e664d; }
 
+        .btn-qr { background: #3498db; margin-top: 8px; }
+        .btn-qr:hover { background: #2980b9; }
+
         .back-link { display: block; margin-top: 15px; font-size: 11px; color: #666; text-decoration: none; font-weight: bold; }
         .back-link:hover { color: #128161; }
+
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-box { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
+        .modal-box h3 { margin-top: 0; font-size: 16px; color: #128161; margin-bottom: 12px; }
+        
+        #qrcodeContainer { display: flex; justify-content: center; align-items: center; margin: 15px 0; background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 8px; position: relative; }
+        #qrcodeContainer img { width: 180px; height: 180px; object-fit: contain; margin: 0 auto; }
     </style>
 </head>
 <body>
@@ -53,18 +64,16 @@
         <input type="tel" id="mobileNumber" placeholder="Enter Mobile Number" autocomplete="off">
         
         <button onclick="saveSettings()">Save Changes</button>
+        <button class="btn-qr" onclick="openQrModal()">📱 View App QR Code</button>
 
         <!-- Data Restore Section Only -->
         <div style="margin-top: 18px; border-top: 1px dashed #d4ece3; padding-top: 12px; text-align: left;">
-            
-            <!-- Restore Toggle Link -->
             <div style="margin-top: 5px; text-align: center;">
                 <a href="javascript:void(0);" onclick="toggleRestoreBox()" style="font-size: 11px; color: #d9534f; font-weight: bold; text-decoration: none;">
                     ⚠️ Data Loss? Click Here to Restore Backup
                 </a>
             </div>
             
-            <!-- Restore Box Container -->
             <div id="restoreBox" style="display: none; margin-top: 10px; background: #f9fdfc; padding: 10px; border-radius: 6px; border: 1px solid #d4ece3;">
                 <p style="font-size: 10px; color: #555; margin: 0 0 5px 0;">WhatsApp ya phone se mili `.json` file select karein:</p>
                 <input type="file" id="backupFileInp" accept=".json" style="margin-bottom: 8px; padding: 5px;">
@@ -73,6 +82,21 @@
         </div>
 
         <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal-box">
+            <h3>App Link QR Code</h3>
+            <p style="font-size: 11px; color: #666; margin: 0;">Is code ko scan karke customer seedha aapke app par aa jayega:</p>
+            <div id="qrcodeContainer">
+                <img src="Chicken Shop MGR.png" alt="Shop QR Code">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="closeQrModal()" style="background: #7f8c8d; margin-top: 0;">Close</button>
+                <a href="Chicken Shop MGR.png" download="Chicken_Shop_QR.png" style="flex: 1;"><button style="background: #27ae60; margin-top: 0; width: 100%;">Download QR</button></a>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -127,6 +151,14 @@
 
             alert('Settings Updated Successfully!');
             window.location.href = 'dashboard.html';
+        }
+
+        function openQrModal() {
+            document.getElementById('qrModal').style.display = 'flex';
+        }
+
+        function closeQrModal() {
+            document.getElementById('qrModal').style.display = 'none';
         }
 
         function toggleRestoreBox() {
